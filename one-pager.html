@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Referral Update, Dr. Alvarez</title>
+
+<!-- PREVIEW with sample data. Not real patients. -->
+
+<!-- Live site faces. Fallbacks are deliberate: if the PDF renderer has no
+     network, Georgia stands in for Unna and the system sans for Instrument
+     Sans, and the layout still holds. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Unna:ital,wght@1,400;1,700&display=swap" rel="stylesheet">
+
+<style>
+  @page { size: letter; margin: 0; }
+
+  :root {
+    --purple:   #561D57;
+    --purple-d: #40143F;
+    --magenta:  #923895;
+    --orange:   #F79445;
+    --lime:     #CBDB2F;
+    --gold:     #F1D332;
+    --pink:     #D97BA3;
+    --teal:     #78C2DE;
+    --ink:      #333333;
+    --ink-soft: #6B5C6B;
+    --ink-mute: #8E8296;
+    --line:     #E7DDE8;
+    --tint:     #F7F1F7;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: #EDE6EE;
+    font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* The sheet is a real US Letter page, so screen preview equals print. */
+  .sheet {
+    width: 8.5in; height: 11in;
+    margin: 24px auto; padding: 0;
+    background: #FFFFFF;
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 10px 40px rgba(86,29,87,.18);
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  /* ---------- header ---------- */
+  .head {
+    background: var(--purple);
+    color: #FFFFFF;
+    padding: 0.36in 0.5in 0.3in;
+    position: relative; overflow: hidden;
+    flex: none;
+  }
+  .head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+  .logo { height: 46px; width: auto; display: block; }
+  .head-meta { text-align: right; flex: none; }
+  .eyebrow {
+    font-size: 8.5px; font-weight: 700; letter-spacing: .19em;
+    text-transform: uppercase; color: var(--gold); margin: 0 0 5px;
+  }
+  .period { font-size: 11.5px; font-weight: 600; color: #F0E2F0; margin: 0; }
+
+  .title {
+    font-size: 31px; line-height: 1.14; font-weight: 600;
+    margin: 14px 0 0; letter-spacing: -.012em; color: #FFFFFF;
+    text-wrap: balance;
+  }
+  /* The site signature: sans headline with an italic Unna accent in a leaf color. */
+  .title em {
+    font-family: 'Unna', Georgia, 'Times New Roman', serif;
+    font-style: italic; font-weight: 400; color: var(--gold);
+  }
+  .subtitle {
+    margin: 8px 0 0; font-size: 12.5px; line-height: 1.5;
+    color: #E6D4E7; max-width: 5.4in; font-weight: 400;
+  }
+  .subtitle strong { color: #FFFFFF; font-weight: 700; }
+
+
+  /* ---------- columns ---------- */
+  .cols {
+    flex: none;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.17in;
+    padding: 0.28in 0.5in 0.1in;
+  }
+  .col { display: flex; flex-direction: column; min-height: 0; }
+
+  .col-head {
+    border-radius: 13px 13px 0 0;
+    padding: 8px 12px 7px;
+    display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  }
+  .col-title {
+    font-size: 13px; font-weight: 700; letter-spacing: -.006em; color: var(--purple-d);
+  }
+  .col-count {
+    font-size: 13px; font-weight: 700; color: var(--purple-d);
+    font-variant-numeric: tabular-nums;
+  }
+  .col-note {
+    font-size: 9.5px; line-height: 1.42; color: var(--ink-soft);
+    padding: 7px 12px 8px; border-left: 1px solid var(--line); border-right: 1px solid var(--line);
+    background: var(--tint); font-weight: 500;
+  }
+  .list {
+    flex: 1 1 auto; min-height: 4.35in;
+    border: 1px solid var(--line); border-top: 0;
+    border-radius: 0 0 13px 13px;
+    padding: 4px 0 6px;
+  }
+  .row { padding: 6px 12px 6px; border-bottom: 1px solid #F2ECF3; }
+  .row:last-child { border-bottom: 0; }
+  .name {
+    font-size: 12px; font-weight: 600; color: var(--ink); line-height: 1.28;
+  }
+  .status {
+    font-size: 9.5px; font-weight: 600; line-height: 1.3; margin-top: 2px;
+    letter-spacing: .012em;
+  }
+  .empty {
+    padding: 12px; font-size: 10px; color: var(--ink-mute); font-style: italic;
+  }
+
+  /* ---------- status definitions ---------- */
+  .defs { flex: none; padding: 0.2in 0.5in 0.04in; }
+  .defs-inner { border-top: 1px solid var(--line); padding: 11px 0 0; }
+  .defs-title {
+    font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--ink-mute); margin: 0 0 8px;
+  }
+  .defs-grid { column-count: 3; column-gap: 0.19in; }
+  .def {
+    break-inside: avoid; -webkit-column-break-inside: avoid;
+    margin: 0 0 7px; font-size: 9.3px; line-height: 1.45; color: var(--ink-soft);
+  }
+  .def b { font-weight: 700; }
+
+  /* ---------- footer ---------- */
+  .foot {
+    flex: none; margin-top: auto;
+    background: var(--purple); color: #FFFFFF;
+    padding: 0.2in 0.5in 0.18in;
+  }
+  .foot-card { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+  .foot-ask { font-size: 11px; line-height: 1.45; color: #F0E2F0; font-weight: 600; }
+  .foot-ask em {
+    font-family: 'Unna', Georgia, serif; font-style: italic; font-weight: 400;
+    color: var(--gold); font-size: 13.5px;
+  }
+  .foot-rep { text-align: right; font-size: 10px; line-height: 1.52; color: #D6BFD7; flex: none; }
+  .foot-rep .rep-name { font-weight: 700; color: #FFFFFF; font-size: 11.5px; }
+  .legal {
+    margin: 12px 0 0; padding: 9px 0 0;
+    border-top: 1px solid rgba(255,255,255,.17);
+    font-size: 7.6px; line-height: 1.45; color: rgba(255,255,255,.6);
+    display: flex; justify-content: space-between; gap: 14px;
+  }
+
+  /* ---------- print ---------- */
+  @media print {
+    html, body { background: #FFFFFF; }
+    .sheet { margin: 0; box-shadow: none; page-break-after: avoid; }
+    .screen-only { display: none !important; }
+  }
+
+  .screen-only {
+    max-width: 8.5in; margin: 0 auto 26px; padding: 0 4px;
+    font-size: 12px; color: #5E5265; line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+<div class="screen-only"><strong>Preview with sample data.</strong> These are made-up names, not real patients. Print or save as PDF at US Letter, 100% scale, background graphics on.</div>
+  <div class="sheet">
+
+    <header class="head">
+      <div class="head-row">
+        <img class="logo" src="https://www.thetreetop.com/wp-content/uploads/2026/04/Untitled-design.webp" alt="The Treetop ABA Therapy Center">
+        <div class="head-meta">
+          <p class="eyebrow">Referral Update</p>
+          <p class="period">February 17 to August 17, 2026</p>
+        </div>
+      </div>
+
+      <h1 class="title">Dr. Alvarez, here is how your <em>patients are doing.</em></h1>
+      <p class="subtitle">
+        <strong>13 children</strong> you referred to The Treetop are with us right now.
+        Below is where each one stands today, so you have an answer the moment a parent asks.
+      </p>
+    </header>
+
+    <main class="cols">
+        <div class="col">
+          <div class="col-head" style="background:#CBDB2F;">
+            <span class="col-title">In Care</span>
+            <span class="col-count">4</span>
+          </div>
+          <div class="col-note">Therapy is underway.</div>
+          <div class="list">
+          <div class="row">
+            <div class="name">Emma Smith</div>
+          </div>
+          <div class="row">
+            <div class="name">Jack Jones</div>
+          </div>
+          <div class="row">
+            <div class="name">Liam Carter</div>
+          </div>
+          <div class="row">
+            <div class="name">Ava Nguyen</div>
+          </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="col-head" style="background:#78C2DE;">
+            <span class="col-title">In Progress</span>
+            <span class="col-count">6</span>
+          </div>
+          <div class="col-note">Actively moving toward a start date.</div>
+          <div class="list">
+          <div class="row">
+            <div class="name">Sarah Williams</div>
+            <div class="status" style="color:#2E7898;">In assessment</div>
+          </div>
+          <div class="row">
+            <div class="name">Mateo Rivera</div>
+            <div class="status" style="color:#2E7898;">In assessment</div>
+          </div>
+          <div class="row">
+            <div class="name">Grace Bennett</div>
+            <div class="status" style="color:#2E7898;">Verifying benefits</div>
+          </div>
+          <div class="row">
+            <div class="name">Elijah Foster</div>
+            <div class="status" style="color:#2E7898;">Finalizing paperwork</div>
+          </div>
+          <div class="row">
+            <div class="name">Olivia Davis</div>
+            <div class="status" style="color:#2E7898;">Matching a BCBA</div>
+          </div>
+          <div class="row">
+            <div class="name">Henry Park</div>
+            <div class="status" style="color:#2E7898;">Matching a BCBA</div>
+          </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="col-head" style="background:#F79445;">
+            <span class="col-title">Needs Attention</span>
+            <span class="col-count">3</span>
+          </div>
+          <div class="col-note">Stuck on something we cannot resolve alone.</div>
+          <div class="list">
+          <div class="row">
+            <div class="name">Michael Brown</div>
+            <div class="status" style="color:#A8550F;">Needs a diagnosis</div>
+          </div>
+          <div class="row">
+            <div class="name">Zoe Martinez</div>
+            <div class="status" style="color:#A8550F;">Unable to reach family</div>
+          </div>
+          <div class="row">
+            <div class="name">Noah Wilson</div>
+            <div class="status" style="color:#A8550F;">Services paused</div>
+          </div>
+          </div>
+        </div>
+    </main>
+
+    <section class="defs">
+      <div class="defs-inner">
+        <p class="defs-title">What each status means</p>
+        <div class="defs-grid">
+          <p class="def"><b style="color:#5E6B0C;">In care:</b> Therapy is underway and going well. We will keep you posted on new milestones, and the assigned BCBA is always glad to talk through progress.</p>
+          <p class="def"><b style="color:#2E7898;">In assessment:</b> Assessment is in progress and the care plan is being prepared for insurance submission. This is the last step before therapy begins.</p>
+          <p class="def"><b style="color:#2E7898;">Verifying benefits and finalizing paperwork:</b> We are in regular contact with the family and are collecting the last documentation needed to move forward.</p>
+          <p class="def"><b style="color:#2E7898;">Matching a BCBA:</b> We are matching the right clinic and the right BCBA, and watching capacity closely so we can move the moment an opening comes up.</p>
+          <p class="def"><b style="color:#A8550F;">Needs a diagnosis or insurance review:</b> Either there is no autism diagnosis on file yet, in which case we help the family find a provider who can complete one, or we are still working through insurance.</p>
+          <p class="def"><b style="color:#A8550F;">Unable to reach family:</b> We have reached out and have not connected yet. We will keep trying, and will call you directly if we continue to have trouble.</p>
+          <p class="def"><b style="color:#A8550F;">Services paused:</b> This can follow a change in coverage, a family request, or a temporary change such as a pending restart, reschedule, or transfer to another clinic.</p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <div class="foot-card">
+        <div class="foot-ask">
+          Questions about any of these families, or want to send a new referral?<br>
+          <em>Just reach out. We answer the same day.</em>
+        </div>
+        <div class="foot-rep">
+          <div class="rep-name">Sean Whitfield</div>
+          Business Development<br>
+          sean@thetreetop.com &nbsp;&middot;&nbsp; (555) 010-4820
+        </div>
+      </div>
+      <div class="legal">
+        <span>Confidential. Contains protected health information intended only for the
+        referring provider named above.</span>
+        <span>Generated August 19, 2026</span>
+      </div>
+    </footer>
+
+  </div>
+</body>
+</html>

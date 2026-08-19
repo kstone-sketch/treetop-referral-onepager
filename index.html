@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Unna:ital,wght@1,400;1,700&display=swap" rel="stylesheet">
+<title>Referral One-Pager</title>
+<style>
+  :root {
+    --bg:#FAF6FA; --surface:#FFFFFF; --line:#E7DDE8;
+    --ink:#2A1B2B; --ink-soft:#5C4E5E; --muted:#8E8296;
+    --purple:#561D57; --magenta:#923895; --teal:#2E7898; --orange:#A8550F;
+    --code-bg:#F4EDF5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#171018; --surface:#211826; --line:#3A2C3C;
+      --ink:#F4EEF4; --ink-soft:#C3B4C4; --muted:#918596;
+      --purple:#D9A8DA; --magenta:#E0A0E2; --teal:#8FD0E8; --orange:#F0A86A;
+      --code-bg:#2C1F2E;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#171018; --surface:#211826; --line:#3A2C3C;
+    --ink:#F4EEF4; --ink-soft:#C3B4C4; --muted:#918596;
+    --purple:#D9A8DA; --magenta:#E0A0E2; --teal:#8FD0E8; --orange:#F0A86A;
+    --code-bg:#2C1F2E;
+  }
+  body {
+    background:var(--bg); color:var(--ink); margin:0; padding:0; line-height:1.65;
+    font-family:'Instrument Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  }
+  .wrap { max-width:960px; margin:0 auto; padding:46px 20px 88px; }
+  .eyebrow { font-size:10.5px; font-weight:700; letter-spacing:.19em; text-transform:uppercase; color:var(--magenta); margin:0 0 11px; }
+  h1 { font-size:clamp(30px,5vw,44px); line-height:1.08; letter-spacing:-.022em; margin:0 0 14px; font-weight:600; text-wrap:balance; }
+  h1 em { font-family:'Unna',Georgia,serif; font-style:italic; font-weight:400; color:var(--magenta); }
+  h2 { font-size:clamp(20px,3vw,26px); line-height:1.2; letter-spacing:-.016em; margin:0 0 8px; font-weight:600; }
+  h3 { font-size:14.5px; font-weight:700; margin:0 0 5px; }
+  p { margin:0 0 13px; color:var(--ink-soft); }
+  .lede { font-size:16.5px; max-width:64ch; }
+  section { margin-top:50px; }
+  .rule { height:1px; background:var(--line); border:0; margin:0 0 20px; }
+  .kicker { display:inline-block; font-size:10px; font-weight:700; letter-spacing:.17em; text-transform:uppercase; margin-bottom:7px; }
+  .k-review { color:var(--magenta); } .k-build { color:var(--teal); } .k-print { color:var(--orange); }
+
+  .cards { display:grid; gap:11px; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); margin-top:16px; }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:15px; padding:16px 17px 14px; }
+  .card p { margin:0; font-size:13px; }
+
+  .tablewrap { overflow-x:auto; border:1px solid var(--line); border-radius:15px; background:var(--surface); margin-top:16px; }
+  table { border-collapse:collapse; width:100%; min-width:600px; font-size:12.5px; }
+  th { text-align:left; font-size:10px; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); font-weight:700; padding:12px 15px; border-bottom:1px solid var(--line); white-space:nowrap; }
+  td { padding:11px 15px; border-bottom:1px solid var(--line); vertical-align:top; color:var(--ink-soft); }
+  tr:last-child td { border-bottom:0; }
+  strong { color:var(--ink); }
+  .crm { font-size:11.5px; color:var(--muted); }
+  code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:11.5px; background:var(--code-bg); color:var(--magenta); padding:2px 6px; border-radius:5px; white-space:nowrap; }
+  pre { background:var(--code-bg); border:1px solid var(--line); border-radius:13px; padding:15px 17px; overflow-x:auto; font-size:11.5px; line-height:1.6; color:var(--ink-soft); margin:13px 0 0; }
+  pre code { background:none; padding:0; color:inherit; white-space:pre; }
+  .sw { display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:9px; vertical-align:middle; }
+
+  ul.rules { margin:16px 0 0; padding:0; list-style:none; display:flex; flex-direction:column; gap:1px; background:var(--line); border:1px solid var(--line); border-radius:15px; overflow:hidden; }
+  ul.rules li { background:var(--surface); padding:14px 17px; color:var(--ink-soft); font-size:13.5px; }
+  ul.rules li strong { display:block; margin-bottom:2px; font-size:14px; }
+
+  .note { background:var(--code-bg); border-radius:15px; padding:16px 18px; margin-top:16px; }
+  .note p { margin:0; font-size:13.5px; }
+  .note .lbl { display:block; font-size:10px; font-weight:700; letter-spacing:.17em; text-transform:uppercase; color:var(--magenta); margin-bottom:6px; }
+
+  /* the sheet renders at fixed inches; let it scroll rather than squash */
+  .stage { margin-top:12px; overflow-x:auto; background:#EDE6EE; border:1px solid var(--line); border-radius:18px; padding:20px; color-scheme:light; }
+  .sheet-frame { display:block; margin:0 auto; border:0; background:#fff; box-shadow:0 8px 30px rgba(86,29,87,.18); }
+  .caption { font-size:12px; color:var(--muted); margin-top:9px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Provider Relations &middot; Salesforce Output</p>
+  <h1>Referral One-Pager</h1>
+  <p class="lede">
+    One printed page that shows a referring doctor where every child they sent us stands.
+    A rep presses a button in Salesforce, hands this to the physician on a visit, or attaches
+    it to an email as a PDF. Styled to match thetreetop.com.
+  </p>
+
+  <div class="cards">
+    <div class="card"><h3>Fits on one page</h3><p>US Letter, fixed height. No scrolling, no second sheet, nothing cut off at the fold.</p></div>
+    <div class="card"><h3>Three columns</h3><p>In Care, In Progress, Needs Attention. Detailed status sits beside the name in the last two.</p></div>
+    <div class="card"><h3>Safer than an email</h3><p>Names travel as a PDF attachment rather than in an email body.</p></div>
+  </div>
+
+  <section>
+    <p class="kicker k-review">Design review</p>
+    <h2>The page</h2>
+    <hr class="rule">
+    <p>
+      Sample data. These are made-up names, not real patients.
+    </p>
+<div class="stage"><iframe class="sheet-frame" title="One-pager preview" width="816" height="1056" srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;
+&lt;title&gt;Referral Update, Dr. Alvarez&lt;/title&gt;
+
+&lt;!-- PREVIEW with sample data. Not real patients. --&gt;
+
+&lt;!-- Live site faces. Fallbacks are deliberate: if the PDF renderer has no
+     network, Georgia stands in for Unna and the system sans for Instrument
+     Sans, and the layout still holds. --&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&amp;family=Unna:ital,wght@1,400;1,700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+
+&lt;style&gt;
+  @page { size: letter; margin: 0; }
+
+  :root {
+    --purple:   #561D57;
+    --purple-d: #40143F;
+    --magenta:  #923895;
+    --orange:   #F79445;
+    --lime:     #CBDB2F;
+    --gold:     #F1D332;
+    --pink:     #D97BA3;
+    --teal:     #78C2DE;
+    --ink:      #333333;
+    --ink-soft: #6B5C6B;
+    --ink-mute: #8E8296;
+    --line:     #E7DDE8;
+    --tint:     #F7F1F7;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: #EDE6EE;
+    font-family: &#x27;Instrument Sans&#x27;, -apple-system, BlinkMacSystemFont, &#x27;Segoe UI&#x27;,
+                 Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* The sheet is a real US Letter page, so screen preview equals print. */
+  .sheet {
+    width: 8.5in; height: 11in;
+    margin: 0 auto; padding: 0;
+    background: #FFFFFF;
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 10px 40px rgba(86,29,87,.18);
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+
+  /* ---------- header ---------- */
+  .head {
+    background: var(--purple);
+    color: #FFFFFF;
+    padding: 0.36in 0.5in 0.3in;
+    position: relative; overflow: hidden;
+    flex: none;
+  }
+  .head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+  .logo { height: 46px; width: auto; display: block; }
+  .head-meta { text-align: right; flex: none; }
+  .eyebrow {
+    font-size: 8.5px; font-weight: 700; letter-spacing: .19em;
+    text-transform: uppercase; color: var(--gold); margin: 0 0 5px;
+  }
+  .period { font-size: 11.5px; font-weight: 600; color: #F0E2F0; margin: 0; }
+
+  .title {
+    font-size: 31px; line-height: 1.14; font-weight: 600;
+    margin: 14px 0 0; letter-spacing: -.012em; color: #FFFFFF;
+    text-wrap: balance;
+  }
+  /* The site signature: sans headline with an italic Unna accent in a leaf color. */
+  .title em {
+    font-family: &#x27;Unna&#x27;, Georgia, &#x27;Times New Roman&#x27;, serif;
+    font-style: italic; font-weight: 400; color: var(--gold);
+  }
+  .subtitle {
+    margin: 8px 0 0; font-size: 12.5px; line-height: 1.5;
+    color: #E6D4E7; max-width: 5.4in; font-weight: 400;
+  }
+  .subtitle strong { color: #FFFFFF; font-weight: 700; }
+
+
+  /* ---------- columns ---------- */
+  .cols {
+    flex: none;
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.17in;
+    padding: 0.28in 0.5in 0.1in;
+  }
+  .col { display: flex; flex-direction: column; min-height: 0; }
+
+  .col-head {
+    border-radius: 13px 13px 0 0;
+    padding: 8px 12px 7px;
+    display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+  }
+  .col-title {
+    font-size: 13px; font-weight: 700; letter-spacing: -.006em; color: var(--purple-d);
+  }
+  .col-count {
+    font-size: 13px; font-weight: 700; color: var(--purple-d);
+    font-variant-numeric: tabular-nums;
+  }
+  .col-note {
+    font-size: 9.5px; line-height: 1.42; color: var(--ink-soft);
+    padding: 7px 12px 8px; border-left: 1px solid var(--line); border-right: 1px solid var(--line);
+    background: var(--tint); font-weight: 500;
+  }
+  .list {
+    flex: 1 1 auto; min-height: 4.35in;
+    border: 1px solid var(--line); border-top: 0;
+    border-radius: 0 0 13px 13px;
+    padding: 4px 0 6px;
+  }
+  .row { padding: 6px 12px 6px; border-bottom: 1px solid #F2ECF3; }
+  .row:last-child { border-bottom: 0; }
+  .name {
+    font-size: 12px; font-weight: 600; color: var(--ink); line-height: 1.28;
+  }
+  .status {
+    font-size: 9.5px; font-weight: 600; line-height: 1.3; margin-top: 2px;
+    letter-spacing: .012em;
+  }
+  .empty {
+    padding: 12px; font-size: 10px; color: var(--ink-mute); font-style: italic;
+  }
+
+  /* ---------- status definitions ---------- */
+  .defs { flex: none; padding: 0.2in 0.5in 0.04in; }
+  .defs-inner { border-top: 1px solid var(--line); padding: 11px 0 0; }
+  .defs-title {
+    font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase;
+    color: var(--ink-mute); margin: 0 0 8px;
+  }
+  .defs-grid { column-count: 3; column-gap: 0.19in; }
+  .def {
+    break-inside: avoid; -webkit-column-break-inside: avoid;
+    margin: 0 0 7px; font-size: 9.3px; line-height: 1.45; color: var(--ink-soft);
+  }
+  .def b { font-weight: 700; }
+
+  /* ---------- footer ---------- */
+  .foot {
+    flex: none; margin-top: auto;
+    background: var(--purple); color: #FFFFFF;
+    padding: 0.2in 0.5in 0.18in;
+  }
+  .foot-card { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+  .foot-ask { font-size: 11px; line-height: 1.45; color: #F0E2F0; font-weight: 600; }
+  .foot-ask em {
+    font-family: &#x27;Unna&#x27;, Georgia, serif; font-style: italic; font-weight: 400;
+    color: var(--gold); font-size: 13.5px;
+  }
+  .foot-rep { text-align: right; font-size: 10px; line-height: 1.52; color: #D6BFD7; flex: none; }
+  .foot-rep .rep-name { font-weight: 700; color: #FFFFFF; font-size: 11.5px; }
+  .legal {
+    margin: 12px 0 0; padding: 9px 0 0;
+    border-top: 1px solid rgba(255,255,255,.17);
+    font-size: 7.6px; line-height: 1.45; color: rgba(255,255,255,.6);
+    display: flex; justify-content: space-between; gap: 14px;
+  }
+
+  /* ---------- print ---------- */
+  @media print {
+    html, body { background: #FFFFFF; }
+    .sheet { margin: 0; box-shadow: none; page-break-after: avoid; }
+    .screen-only { display: none !important; }
+  }
+
+  .screen-only {
+    max-width: 8.5in; margin: 0 auto 26px; padding: 0 4px;
+    font-size: 12px; color: #5E5265; line-height: 1.6;
+  }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;div class=&quot;sheet&quot;&gt;
+
+    &lt;header class=&quot;head&quot;&gt;
+      &lt;div class=&quot;head-row&quot;&gt;
+        &lt;img class=&quot;logo&quot; src=&quot;https://www.thetreetop.com/wp-content/uploads/2026/04/Untitled-design.webp&quot; alt=&quot;The Treetop ABA Therapy Center&quot;&gt;
+        &lt;div class=&quot;head-meta&quot;&gt;
+          &lt;p class=&quot;eyebrow&quot;&gt;Referral Update&lt;/p&gt;
+          &lt;p class=&quot;period&quot;&gt;February 17 to August 17, 2026&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;h1 class=&quot;title&quot;&gt;Dr. Alvarez, here is how your &lt;em&gt;patients are doing.&lt;/em&gt;&lt;/h1&gt;
+      &lt;p class=&quot;subtitle&quot;&gt;
+        &lt;strong&gt;13 children&lt;/strong&gt; you referred to The Treetop are with us right now.
+        Below is where each one stands today, so you have an answer the moment a parent asks.
+      &lt;/p&gt;
+    &lt;/header&gt;
+
+    &lt;main class=&quot;cols&quot;&gt;
+        &lt;div class=&quot;col&quot;&gt;
+          &lt;div class=&quot;col-head&quot; style=&quot;background:#CBDB2F;&quot;&gt;
+            &lt;span class=&quot;col-title&quot;&gt;In Care&lt;/span&gt;
+            &lt;span class=&quot;col-count&quot;&gt;4&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;col-note&quot;&gt;Therapy is underway.&lt;/div&gt;
+          &lt;div class=&quot;list&quot;&gt;
+          &lt;div class=&quot;row&quot;&gt;
+            &lt;div class=&quot;name&quot;&gt;Emma Smith&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;row&quot;&gt;
+            &lt;div class=&quot;name&quot;&gt;Jack Jones&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;row&quot;&gt;
+            &lt;div class=&quot;name&quot;&gt;Liam Carter&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;row&quot;&gt;
+            &lt;div class=&quot;name&quot;&gt;Ava Nguyen&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col&quot;&gt;
+          &lt;div class=&quot;col-head&quot; style=&quot;background:#78C2DE;&quot;&gt;
+            &lt;span class=&quot;col-title&quot;&gt;In Progress&lt;/span&gt;
+            &lt;span class=&quot;col-count&quot;&gt;6&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;col-note&quot;&gt;Actively moving toward a start date.&lt;/div&gt;
+          &lt;div class=&quot;list&quot;&gt;
+          &lt;div class=&quot;row&quot;&gt;
+            &lt;div class=&quot;name&quot;&gt;Sarah Williams&lt;/div&gt;
+            &lt;div class=&quot;status&quot; style=&quot;color:#2E7898;&quot;&gt;In assessment&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;row&quot;&gt;
+            &lt;div class=&quot;name&quot;&gt;Mateo Rivera&lt;/div&gt;
+            &lt;div class=&quot;status&quot; style=&quot;color:#2E7898;&quot;&gt;In assessment&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;row&quot;&gt;
+            &lt;div class=&quot;name&quot;&gt;Grace Bennett&lt;/div&gt;
+            &lt;div class=&quot;status&quot; style=&quot;color:#2E7898;&quot;&gt;Verifying benefits&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;row&quot;&gt;
+            &lt;div class=&quot;name&quot;&gt;Elijah Foster&lt;/div&gt;
+            &lt;div class=&quot;status&quot; style=&quot;color:#2E7898;&quot;&gt;Finalizing paperwork&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;row&quot;&gt;
+            &lt;div class=&quot;name&quot;&gt;Olivia Davis&lt;/div&gt;
+            &lt;div class=&quot;status&quot; style=&quot;color:#2E7898;&quot;&gt;Matching a BCBA&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;row&quot;&gt;
+            &lt;div class=&quot;name&quot;&gt;Henry Park&lt;/div&gt;
+            &lt;div class=&quot;status&quot; style=&quot;color:#2E7898;&quot;&gt;Matching a BCBA&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;col&quot;&gt;
+          &lt;div class=&quot;col-head&quot; style=&quot;background:#F79445;&quot;&gt;
+            &lt;span class=&quot;col-title&quot;&gt;Needs Attention&lt;/span&gt;
+            &lt;span class=&quot;col-count&quot;&gt;3&lt;/span&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;col-note&quot;&gt;Stuck on something we cannot resolve alone.&lt;/div&gt;
+          &lt;div class=&quot;list&quot;&gt;
+          &lt;div class=&quot;row&quot;&gt;
+            &lt;div class=&quot;name&quot;&gt;Michael Brown&lt;/div&gt;
+            &lt;div class=&quot;status&quot; style=&quot;color:#A8550F;&quot;&gt;Needs a diagnosis&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;row&quot;&gt;
+            &lt;div class=&quot;name&quot;&gt;Zoe Martinez&lt;/div&gt;
+            &lt;div class=&quot;status&quot; style=&quot;color:#A8550F;&quot;&gt;Unable to reach family&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;row&quot;&gt;
+            &lt;div class=&quot;name&quot;&gt;Noah Wilson&lt;/div&gt;
+            &lt;div class=&quot;status&quot; style=&quot;color:#A8550F;&quot;&gt;Services paused&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/main&gt;
+
+    &lt;section class=&quot;defs&quot;&gt;
+      &lt;div class=&quot;defs-inner&quot;&gt;
+        &lt;p class=&quot;defs-title&quot;&gt;What each status means&lt;/p&gt;
+        &lt;div class=&quot;defs-grid&quot;&gt;
+          &lt;p class=&quot;def&quot;&gt;&lt;b style=&quot;color:#5E6B0C;&quot;&gt;In care:&lt;/b&gt; Therapy is underway and going well. We will keep you posted on new milestones, and the assigned BCBA is always glad to talk through progress.&lt;/p&gt;
+          &lt;p class=&quot;def&quot;&gt;&lt;b style=&quot;color:#2E7898;&quot;&gt;In assessment:&lt;/b&gt; Assessment is in progress and the care plan is being prepared for insurance submission. This is the last step before therapy begins.&lt;/p&gt;
+          &lt;p class=&quot;def&quot;&gt;&lt;b style=&quot;color:#2E7898;&quot;&gt;Verifying benefits and finalizing paperwork:&lt;/b&gt; We are in regular contact with the family and are collecting the last documentation needed to move forward.&lt;/p&gt;
+          &lt;p class=&quot;def&quot;&gt;&lt;b style=&quot;color:#2E7898;&quot;&gt;Matching a BCBA:&lt;/b&gt; We are matching the right clinic and the right BCBA, and watching capacity closely so we can move the moment an opening comes up.&lt;/p&gt;
+          &lt;p class=&quot;def&quot;&gt;&lt;b style=&quot;color:#A8550F;&quot;&gt;Needs a diagnosis or insurance review:&lt;/b&gt; Either there is no autism diagnosis on file yet, in which case we help the family find a provider who can complete one, or we are still working through insurance.&lt;/p&gt;
+          &lt;p class=&quot;def&quot;&gt;&lt;b style=&quot;color:#A8550F;&quot;&gt;Unable to reach family:&lt;/b&gt; We have reached out and have not connected yet. We will keep trying, and will call you directly if we continue to have trouble.&lt;/p&gt;
+          &lt;p class=&quot;def&quot;&gt;&lt;b style=&quot;color:#A8550F;&quot;&gt;Services paused:&lt;/b&gt; This can follow a change in coverage, a family request, or a temporary change such as a pending restart, reschedule, or transfer to another clinic.&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;footer class=&quot;foot&quot;&gt;
+      &lt;div class=&quot;foot-card&quot;&gt;
+        &lt;div class=&quot;foot-ask&quot;&gt;
+          Questions about any of these families, or want to send a new referral?&lt;br&gt;
+          &lt;em&gt;Just reach out. We answer the same day.&lt;/em&gt;
+        &lt;/div&gt;
+        &lt;div class=&quot;foot-rep&quot;&gt;
+          &lt;div class=&quot;rep-name&quot;&gt;Sean Whitfield&lt;/div&gt;
+          Business Development&lt;br&gt;
+          sean@thetreetop.com &amp;nbsp;&amp;middot;&amp;nbsp; (555) 010-4820
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;legal&quot;&gt;
+        &lt;span&gt;Confidential. Contains protected health information intended only for the
+        referring provider named above.&lt;/span&gt;
+        &lt;span&gt;Generated August 19, 2026&lt;/span&gt;
+      &lt;/div&gt;
+    &lt;/footer&gt;
+
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></div>
+
+    <p class="caption">US Letter at 100%% scale. Print with background graphics enabled.</p>
+  </section>
+
+  <section>
+    <p class="kicker k-build">Automation spec</p>
+    <h2>Where each child lands</h2>
+    <hr class="rule">
+    <p>
+      This is the mapping Dove builds against. Every child in the six-month window resolves to
+      exactly one column and one printed label. Column one prints names only, since a doctor
+      does not need a status for a child already in therapy.
+    </p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>CRM onboarding step / reason</th><th>Column</th><th>Prints as</th></tr></thead>
+        <tbody>
+          <tr><td class="crm">Services Active</td><td><strong>In Care</strong></td><td>(no label, name only)</td></tr>
+          <tr><td class="crm">Assessment</td><td><strong>In Progress</strong></td><td>In assessment</td></tr>
+          <tr><td class="crm">Eligibility / Sent for Benefits Check</td><td><strong>In Progress</strong></td><td>Verifying benefits</td></tr>
+          <tr><td class="crm">Eligibility / Benefits Check Complete</td><td><strong>In Progress</strong></td><td>Finalizing paperwork</td></tr>
+          <tr><td class="crm">Waitlist</td><td><strong>In Progress</strong></td><td>Matching a BCBA</td></tr>
+          <tr><td class="crm">Pending Onboarding / Pending Intake (no dx)</td><td><strong>Needs Attention</strong></td><td>Needs a diagnosis</td></tr>
+          <tr><td class="crm">Pending Onboarding / Pending Intake (insurance)</td><td><strong>Needs Attention</strong></td><td>Insurance review</td></tr>
+          <tr><td class="crm">New / Never Contacted or Attempting to Contact</td><td><strong>Needs Attention</strong></td><td>Unable to reach family</td></tr>
+          <tr><td class="crm">Services Disrupted</td><td><strong>Needs Attention</strong></td><td>Services paused</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="note">
+      <span class="lbl">One judgment call to confirm</span>
+      <p>Waitlist sits in <strong>In Progress</strong>, not Needs Attention. Capacity is ours to
+      solve and there is nothing the doctor can do about it, whereas everything in the third
+      column is genuinely stuck on the outside world. If Ethan would rather waitlist read as
+      stalled, it is a one-line change.</p>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker k-build">Automation spec</p>
+    <h2>Merge fields</h2>
+    <hr class="rule">
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>What it holds</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td><code>DOCTOR_LAST</code></td><td>Referring provider's last name</td><td class="crm">Alvarez</td></tr>
+          <tr><td><code>PERIOD</code></td><td>Window the page covers</td><td class="crm">February 17 to August 17, 2026</td></tr>
+          <tr><td><code>COUNT_TOTAL</code></td><td>All children referred in the window</td><td class="crm">13</td></tr>
+          <tr><td><code>COUNT_CARE</code></td><td>Children in the In Care column</td><td class="crm">4</td></tr>
+          <tr><td><code>COUNT_PROGRESS</code></td><td>Children in the In Progress column</td><td class="crm">6</td></tr>
+          <tr><td><code>COUNT_ATTENTION</code></td><td>Children in the Needs Attention column</td><td class="crm">3</td></tr>
+          <tr><td><code>ROWS_CARE</code></td><td>HTML rows for column 1</td><td class="crm">see markup below</td></tr>
+          <tr><td><code>ROWS_PROGRESS</code></td><td>HTML rows for column 2</td><td class="crm">see markup below</td></tr>
+          <tr><td><code>ROWS_ATTENTION</code></td><td>HTML rows for column 3</td><td class="crm">see markup below</td></tr>
+          <tr><td><code>REP_NAME</code></td><td>Who is sending or delivering it</td><td class="crm">Sean Whitfield</td></tr>
+          <tr><td><code>REP_TITLE</code></td><td>Their title</td><td class="crm">Business Development</td></tr>
+          <tr><td><code>REP_EMAIL</code></td><td>Contact email</td><td class="crm">sean@thetreetop.com</td></tr>
+          <tr><td><code>REP_PHONE</code></td><td>Contact phone</td><td class="crm">(555) 010-4820</td></tr>
+          <tr><td><code>GENERATED_DATE</code></td><td>Date the button was pressed</td><td class="crm">August 19, 2026</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker k-build">Automation spec</p>
+    <h2>Row markup to generate</h2>
+    <hr class="rule">
+    <p>
+      Each <code>ROWS_*</code> field holds a block of these, one per child. Columns two and
+      three carry a status; column one does not.
+    </p>
+    <h3>In Progress and Needs Attention</h3>
+    <pre><code>&lt;div class=&quot;row&quot;&gt;
+  &lt;div class=&quot;name&quot;&gt;{{CHILD_NAME}}&lt;/div&gt;
+  &lt;div class=&quot;status&quot; style=&quot;color:{{STATUS_INK}};&quot;&gt;{{STATUS_LABEL}}&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    <h3>In Care</h3>
+    <pre><code>&lt;div class=&quot;row&quot;&gt;
+  &lt;div class=&quot;name&quot;&gt;{{CHILD_NAME}}&lt;/div&gt;
+&lt;/div&gt;</code></pre>
+    <p style="margin-top:14px;">
+      <code>STATUS_INK</code> is the text color for that column. It is a darkened version of the
+      column accent, because the accent itself is too light to read at 9px on white.
+    </p>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Column</th><th>Header accent</th><th>Status text color</th></tr></thead>
+        <tbody>
+          <tr><td><span class="sw" style="background:#CBDB2F"></span><strong>In Care</strong></td><td><code>#CBDB2F</code></td><td><code>#5E6B0C</code></td></tr>
+          <tr><td><span class="sw" style="background:#78C2DE"></span><strong>In Progress</strong></td><td><code>#78C2DE</code></td><td><code>#2E7898</code></td></tr>
+          <tr><td><span class="sw" style="background:#F79445"></span><strong>Needs Attention</strong></td><td><code>#F79445</code></td><td><code>#A8550F</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker k-print">Before it ships</p>
+    <h2>Printing and limits</h2>
+    <hr class="rule">
+    <ul class="rules">
+      <li><strong>Ten names per column with a status, fifteen without</strong>Measured, not estimated: the In Progress and Needs Attention columns overflow the sheet at the eleventh name, In Care at the sixteenth. A doctor above that needs a rule. My recommendation is to print the first ten and close the column with a "plus 4 more, ask us for the full list" line, which keeps the promise of one page. Confirm with Ethan and I will build it.</li>
+      <li><strong>The status legend can be trimmed per doctor</strong>The definitions under the columns explain every status. If a given doctor has nobody in a status, that definition does not need to print, which buys back room for names. Worth doing if the overflow rule turns out to bite often.</li>
+      <li><strong>Background graphics must be on</strong>The purple header and colored column bars are backgrounds. If the PDF step renders with them off, the page turns white. Chrome headless honors <code>print-color-adjust: exact</code>, which is already set.</li>
+      <li><strong>Fonts load from Google</strong>Instrument Sans and Unna come over the network. If the renderer is offline, Georgia and the system sans stand in and the layout still holds, but it will not match the site.</li>
+      <li><strong>Skip empty generations</strong>If a doctor has nobody in the window, do not produce the page.</li>
+      <li><strong>It carries PHI</strong>Child names with treatment status. Compliance should sign off on the Salesforce button, who can press it, and where the file is stored, before the first real one goes out.</li>
+    </ul>
+  </section>
+
+  <section>
+    <p class="kicker k-review">Note</p>
+    <h2>On the branding</h2>
+    <hr class="rule">
+    <p>
+      Built from values read off the live thetreetop.com, not from our internal brand file. The
+      live site runs <strong>Instrument Sans</strong> with <strong>Unna italic</strong> accents
+      and <code>#561D57</code> purple. Our stored guide still says Montserrat on cream, which is
+      a different system. The site won here because matching it was the ask, but the two should
+      be reconciled at some point.
+    </p>
+  </section>
+</div>
+
+
+</body>
+</html>
