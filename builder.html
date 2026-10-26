@@ -1,0 +1,1866 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Referral Update Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Unna:ital,wght@1,400;1,700&display=swap" rel="stylesheet">
+<style>
+/* Layout: purple app bar on top, a white control panel on the left, and the
+   real US Letter sheet sitting on a lilac desk to the right. The sheet is
+   paper and always prints light, so the whole tool commits to one light look. */
+:root {
+  color-scheme: light;
+  /* Treetop live-site palette, read off thetreetop.com */
+  --purple: #561D57;
+  --purple-d: #40143F;
+  --magenta: #923895;
+  --orange: #F79445;
+  --lime: #CBDB2F;
+  --gold: #F1D332;
+  --pink: #D97BA3;
+  --teal: #78C2DE;
+  /* sheet neutrals, same as the approved one-pager */
+  --ink: #333333;
+  --ink-soft: #6B5C6B;
+  --ink-mute: #8E8296;
+  --line: #E7DDE8;
+  --tint: #F7F1F7;
+  /* app chrome */
+  --desk: #EDE6EE;
+  --panel: #FFFFFF;
+  --panel-line: #EADFEB;
+  --field: #FFF7F1;
+  --field-line: #E6D8E4;
+  --body-soft: #654766;
+  --ok: #3E6E12;
+  --ok-bg: #EBF4D2;
+  --bad: #A3271F;
+  --bad-bg: #FCE9E7;
+  --note-bg: #FFF6CC;
+  --note-line: #EBD67A;
+  --note-ink: #5C4A00;
+  --sans: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  --serif: 'Unna', Georgia, 'Times New Roman', serif;
+}
+
+@page { size: letter; margin: 0; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  background: var(--desk);
+  font-family: var(--sans);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+button { font-family: inherit; }
+:focus-visible { outline: 2px solid var(--magenta); outline-offset: 2px; }
+
+/* ================= app bar ================= */
+.top {
+  position: sticky; top: 0; z-index: 60;
+  background: var(--purple); color: #FFFFFF;
+  display: flex; align-items: center; gap: 10px;
+  min-height: 62px;
+  padding-block: 10px;
+  padding-left: max(18px, env(safe-area-inset-left, 0px));
+  padding-right: max(18px, env(safe-area-inset-right, 0px));
+}
+.brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.brand img { height: 34px; width: auto; display: block; }
+.app-name {
+  font-size: 15px; font-weight: 600; color: #F0E2F0; white-space: nowrap;
+  padding-left: 14px; border-left: 1px solid rgba(255,255,255,.22);
+}
+.app-name em { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--gold); font-size: 18px; }
+.top .spacer { flex: 1; }
+.tb {
+  appearance: none; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  height: 38px; padding: 0 15px; border-radius: 50px;
+  border: 1px solid rgba(255,255,255,.3); background: transparent; color: #FFFFFF;
+  font: 600 13px/1 var(--sans); cursor: pointer; white-space: nowrap;
+  transition: background .15s;
+}
+.tb:hover { background: rgba(255,255,255,.1); }
+.tb:disabled { opacity: .38; cursor: default; background: transparent; }
+.tb.icon { width: 38px; padding: 0; }
+.tb.primary { background: var(--lime); border-color: var(--lime); color: #333333; font-weight: 700; padding: 0 18px; }
+.tb.primary:hover { background: #D8E651; }
+.tb:focus-visible { outline-color: var(--gold); }
+.tb svg { flex: none; }
+
+/* ================= layout ================= */
+.app { display: grid; grid-template-columns: 344px minmax(0, 1fr); align-items: start; }
+
+.side {
+  position: sticky; top: 62px;
+  height: calc(100vh - 62px); overflow-y: auto;
+  background: var(--panel); border-right: 1px solid var(--panel-line);
+  padding: 20px 20px 32px;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+}
+.desk {
+  min-width: 0;
+  padding-block: 20px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.desk-inner { width: calc(816px * var(--z, 1)); max-width: 100%; margin: 0 auto; }
+.stage { width: 816px; }
+
+/* ================= side panel ================= */
+.sec + .sec { margin-top: 28px; }
+.side h2 {
+  margin: 0 0 14px; padding-bottom: 9px; border-bottom: 1px solid var(--panel-line);
+  font: 700 11px/1 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--magenta);
+}
+.hint { margin: -4px 0 12px; font-size: 12.5px; line-height: 1.45; color: var(--body-soft); }
+
+.tips {
+  background: var(--purple); color: #E8D8E9; border-radius: 18px;
+  padding: 16px 16px 14px; margin-bottom: 26px;
+}
+.tips h2 { color: #FFFFFF; border: 0; padding: 0; margin: 0 0 10px; font: 600 16px/1.2 var(--sans); letter-spacing: 0; text-transform: none; }
+.tips h2 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--gold); font-size: 19px; }
+.tips ol { margin: 0; padding: 0; list-style: none; counter-reset: step; display: grid; gap: 9px; }
+.tips li { counter-increment: step; display: grid; grid-template-columns: 22px 1fr; gap: 9px; font-size: 13px; line-height: 1.45; }
+.tips li::before {
+  content: counter(step); width: 22px; height: 22px; border-radius: 50%;
+  background: var(--gold); color: var(--purple-d); font: 700 11.5px/22px var(--sans); text-align: center;
+}
+.tips b { color: #FFFFFF; font-weight: 600; }
+.tips-acts { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+.chip-btn {
+  appearance: none; height: 32px; padding: 0 14px; border-radius: 50px; border: 0;
+  background: var(--lime); color: #333333; font: 700 12.5px var(--sans); cursor: pointer;
+}
+.chip-btn:hover { background: #D8E651; }
+.link-btn {
+  appearance: none; background: none; border: 0; padding: 0; cursor: pointer;
+  font: 600 12.5px var(--sans); color: inherit; text-decoration: underline; text-underline-offset: 3px;
+}
+.tips .link-btn { color: #D9C3DA; }
+
+.field { display: grid; gap: 6px; margin-bottom: 12px; }
+.field label { font: 600 12.5px/1.2 var(--sans); color: var(--purple); }
+.field input {
+  width: 100%; height: 40px; padding: 0 12px;
+  border: 1px solid var(--field-line); border-radius: 10px; background: var(--field);
+  font: 400 14px var(--sans); color: var(--ink);
+}
+.field input:focus { outline: 2px solid var(--magenta); outline-offset: 1px; background: #FFFFFF; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.two .field { margin-bottom: 0; }
+
+.lib-label { margin: 16px 0 8px; font: 600 12px var(--sans); color: var(--ink-soft); }
+.lib-label:first-of-type { margin-top: 0; }
+.lib { display: grid; gap: 8px; }
+.tile {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 12px; border: 1px solid var(--panel-line); border-radius: 12px;
+  background: #FFFFFF; color: var(--ink); cursor: grab; user-select: none;
+  transition: border-color .15s, box-shadow .15s, transform .15s;
+}
+.tile:hover { border-color: var(--magenta); box-shadow: 0 4px 14px rgba(86,29,87,.1); transform: translateY(-1px); }
+.tile .sw { width: 26px; height: 26px; border-radius: 8px; flex: none; display: grid; place-items: center; color: var(--purple); }
+.tile .sw.dashed { border: 1.5px dashed var(--magenta); color: var(--magenta); }
+.tile .sw.soft { background: var(--tint); }
+.tile .tx { flex: 1; min-width: 0; display: grid; gap: 1px; }
+.tile .t1 { font-weight: 600; font-size: 13.5px; color: var(--purple-d); }
+.tile .t2 { font-size: 11.5px; color: var(--ink-mute); }
+.tile .st { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 700; color: var(--magenta); white-space: nowrap; }
+.tile.is-on { cursor: default; background: var(--tint); border-color: transparent; box-shadow: none; transform: none; }
+.tile.is-on .st { color: var(--ok); }
+.tile.is-full .st { color: var(--ink-mute); }
+
+.opt { display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; cursor: pointer; }
+.opt input {
+  appearance: none; -webkit-appearance: none; flex: none; position: relative; cursor: pointer;
+  width: 38px; height: 22px; margin: 1px 0 0; border-radius: 22px; background: #D6CBD7;
+  transition: background .15s;
+}
+.opt input::after {
+  content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%;
+  background: #FFFFFF; box-shadow: 0 1px 2px rgba(0,0,0,.2); transition: transform .15s;
+}
+.opt input:checked { background: var(--magenta); }
+.opt input:checked::after { transform: translateX(16px); }
+.opt input:disabled { opacity: .45; cursor: default; }
+.opt .o1 { display: block; font-weight: 600; font-size: 13.5px; color: var(--purple-d); }
+.opt .o2 { display: block; margin-top: 2px; font-size: 12px; line-height: 1.4; color: var(--body-soft); }
+.opt.is-off { opacity: .55; cursor: default; }
+
+.privacy {
+  margin-top: 26px; display: grid; grid-template-columns: 18px 1fr; gap: 10px;
+  padding: 13px 14px; border-radius: 12px; background: var(--tint);
+  font-size: 12.5px; line-height: 1.5; color: var(--body-soft);
+}
+.privacy svg { color: var(--magenta); margin-top: 2px; }
+.privacy b { color: var(--purple-d); font-weight: 600; }
+.side-foot { margin-top: 14px; font-size: 12.5px; color: var(--body-soft); }
+.side-foot .link-btn { color: var(--magenta); }
+
+/* ================= desk bars ================= */
+.sheetbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; margin-bottom: 12px; font-size: 12.5px; color: var(--body-soft); }
+.pill { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 12px; border-radius: 50px; font-weight: 700; font-size: 12px; white-space: nowrap; }
+.pill.ok { background: var(--ok-bg); color: var(--ok); }
+.pill.bad { background: var(--bad-bg); color: var(--bad); }
+.pill-btn {
+  appearance: none; border: 0; cursor: pointer; height: 28px; padding: 0 13px; border-radius: 50px;
+  background: var(--bad); color: #FFFFFF; font: 700 12px var(--sans);
+}
+.sheetbar .hint-inline { margin-left: auto; }
+.sample-bar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px;
+  margin-bottom: 12px; padding: 10px 12px 10px 14px; border-radius: 12px;
+  background: var(--note-bg); border: 1px solid var(--note-line); color: var(--note-ink);
+  font-size: 13px; line-height: 1.4;
+}
+.sample-bar b { font-weight: 700; }
+.sample-bar .chip-btn { margin-left: auto; }
+
+/* ================= the sheet (matches the approved one-pager) ================= */
+.sheet {
+  --ph: #B5A9B7; --hov: rgba(146,56,149,.3); --foc: var(--magenta);
+  width: 8.5in; min-height: 11in;
+  background: #FFFFFF; position: relative; overflow: hidden;
+  display: flex; flex-direction: column;
+  box-shadow: 0 10px 40px rgba(86,29,87,.18);
+  font-family: var(--sans); color: var(--ink);
+  -webkit-print-color-adjust: exact; print-color-adjust: exact;
+}
+
+/* editing affordances, screen only */
+.sheet [contenteditable] { outline: none; border-radius: 3px; cursor: text; }
+.sheet [contenteditable]:hover { box-shadow: 0 0 0 2px var(--hov); }
+.sheet [contenteditable]:focus { box-shadow: 0 0 0 2px var(--foc); }
+.sheet [data-ph]:empty::before { content: attr(data-ph); color: var(--ph); pointer-events: none; }
+
+/* header */
+.head {
+  --ph: rgba(255,255,255,.5); --hov: rgba(255,255,255,.42); --foc: var(--gold);
+  background: var(--purple); color: #FFFFFF;
+  padding: 0.36in 0.5in 0.3in; position: relative; flex: none;
+}
+.head-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+.logo { height: 46px; width: auto; display: block; }
+.head-meta { text-align: right; flex: none; }
+.eyebrow { font-size: 8.5px; font-weight: 700; letter-spacing: .19em; text-transform: uppercase; color: var(--gold); margin: 0 0 5px; }
+.period {
+  display: block; margin: 0 0 0 auto; padding: 0; border: 0; background: none; cursor: pointer;
+  font: 600 11.5px var(--sans); color: #F0E2F0; text-align: right; border-radius: 3px;
+}
+.period:hover { box-shadow: 0 0 0 2px var(--hov); }
+.period.is-blank { color: rgba(255,255,255,.5); font-style: italic; }
+.title { font-size: 31px; line-height: 1.14; font-weight: 600; margin: 14px 0 0; letter-spacing: -.012em; color: #FFFFFF; text-wrap: balance; }
+.title em { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--gold); }
+.subtitle { margin: 8px 0 0; font-size: 12.5px; line-height: 1.5; color: #E6D4E7; max-width: 5.4in; font-weight: 400; }
+.subtitle strong { color: #FFFFFF; font-weight: 700; }
+
+/* blocks between header and footer */
+.body { flex: 1 1 auto; display: flex; flex-direction: column; }
+.blk { position: relative; flex: none; }
+.blk-cols { flex: 1 1 auto; display: flex; flex-direction: column; }
+
+/* columns */
+.cols {
+  flex: 1 1 auto;
+  display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 0.17in;
+  padding: 0.28in 0.5in 0.1in;
+}
+.cols-empty {
+  grid-column: 1 / -1; display: grid; place-items: center; min-height: 2in;
+  border: 2px dashed var(--line); border-radius: 13px; color: var(--ink-mute); font-size: 13px; text-align: center; padding: 20px;
+}
+.col { display: flex; flex-direction: column; position: relative; min-width: 0; }
+.col-head {
+  --ph: rgba(64,20,63,.45); --hov: rgba(64,20,63,.35); --foc: var(--purple-d);
+  border-radius: 13px 13px 0 0; padding: 8px 12px 7px;
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+}
+.col-title { font-size: 13px; font-weight: 700; letter-spacing: -.006em; color: var(--purple-d); min-width: 20px; }
+.col-count { font-size: 13px; font-weight: 700; color: var(--purple-d); font-variant-numeric: tabular-nums; }
+.col-note {
+  font-size: 9.5px; line-height: 1.42; color: var(--ink-soft);
+  padding: 7px 12px 8px; border-left: 1px solid var(--line); border-right: 1px solid var(--line);
+  background: var(--tint); font-weight: 500;
+}
+.col-note[contenteditable] { border-radius: 0; }
+.list {
+  flex: 1 1 auto; min-height: 1.3in; display: flex; flex-direction: column;
+  border: 1px solid var(--line); border-top: 0; border-radius: 0 0 13px 13px;
+}
+.rows { flex: 1 1 auto; padding: 4px 0 6px; }
+.row { position: relative; padding: 6px 12px 6px; border-bottom: 1px solid #F2ECF3; background: #FFFFFF; }
+.row:last-of-type { border-bottom: 0; }
+/* With fewer columns on the page each one is wider, so names sit two or
+   three across. That is how a doctor with many children still fits. */
+.cols-1 .rows, .cols-2 .rows { display: grid; grid-template-columns: repeat(var(--across), minmax(0, 1fr)); align-content: start; }
+.cols-1 { --across: 3; }
+.cols-2 { --across: 2; }
+.cols-1 .row, .cols-2 .row { border-bottom: 1px solid #F2ECF3; }
+.cols-1 .rows > .empty, .cols-1 .rows > .add-kid, .cols-2 .rows > .empty, .cols-2 .rows > .add-kid { grid-column: 1 / -1; }
+.name { font-size: 12px; font-weight: 600; color: var(--ink); line-height: 1.28; min-height: 1.28em; }
+.status { font-size: 9.5px; font-weight: 600; line-height: 1.3; margin-top: 2px; letter-spacing: .012em; }
+.st-btn {
+  appearance: none; display: inline-flex; align-items: center; gap: 4px; margin: 0; padding: 0;
+  border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; cursor: pointer; border-radius: 3px; text-align: left;
+}
+.st-btn:hover { box-shadow: 0 0 0 2px var(--hov); }
+.st-empty { color: var(--magenta); font-style: italic; }
+.st-pick {
+  appearance: none; border: 0; background: none; padding: 0 2px; margin-left: 3px; color: inherit; cursor: pointer;
+  vertical-align: middle; line-height: 1; border-radius: 3px;
+}
+.empty { margin: 0; padding: 12px; font-size: 10px; color: var(--ink-mute); font-style: italic; }
+.add-kid {
+  appearance: none; display: flex; align-items: center; gap: 6px;
+  width: calc(100% - 14px); margin: 3px 7px 0; padding: 6px 7px;
+  border: 1px dashed transparent; border-radius: 8px; background: none; cursor: pointer;
+  font: 600 11px var(--sans); color: var(--magenta); opacity: .8; text-align: left;
+}
+.add-kid:hover, .add-kid:focus-visible { opacity: 1; border-color: rgba(146,56,149,.4); background: rgba(146,56,149,.05); }
+
+/* small tool buttons that appear on hover */
+.tbtn {
+  appearance: none; width: 22px; height: 22px; padding: 0; flex: none;
+  display: inline-grid; place-items: center;
+  border: 1px solid var(--line); border-radius: 50%; background: #FFFFFF; color: var(--ink-soft);
+  cursor: pointer; box-shadow: 0 1px 3px rgba(64,20,63,.12);
+}
+.tbtn:hover { color: var(--magenta); border-color: var(--magenta); }
+.tbtn.sm { width: 20px; height: 20px; }
+.tbtn.grip { cursor: grab; }
+.swatch { width: 11px; height: 11px; border-radius: 50%; display: block; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); }
+
+.row-grip {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 12px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-mute); cursor: grab; opacity: 0; transition: opacity .12s;
+}
+.row-acts {
+  position: absolute; right: 4px; top: 50%; transform: translateY(-50%);
+  display: flex; gap: 3px; padding-left: 16px;
+  background: linear-gradient(90deg, rgba(255,255,255,0), #FFFFFF 14px);
+  opacity: 0; pointer-events: none; transition: opacity .12s;
+}
+.row:hover .row-grip, .row:focus-within .row-grip { opacity: 1; }
+.row:hover .row-acts, .row:focus-within .row-acts { opacity: 1; pointer-events: auto; }
+
+.col-tools {
+  position: absolute; top: -25px; right: 0; display: flex; gap: 4px;
+  opacity: 0; pointer-events: none; transition: opacity .12s;
+}
+.col:hover .col-tools, .col:focus-within .col-tools { opacity: 1; pointer-events: auto; }
+
+.blk-tools {
+  position: absolute; left: 13px; top: 12px; z-index: 3;
+  display: flex; flex-direction: column; gap: 5px;
+  opacity: 0; pointer-events: none; transition: opacity .12s;
+}
+.blk-cols > .blk-tools { top: 0.28in; }
+.blk:hover > .blk-tools, .blk:focus-within > .blk-tools { opacity: 1; pointer-events: auto; }
+.blk:has(> .blk-tools:hover) { outline: 1.5px dashed rgba(146,56,149,.45); outline-offset: -3px; }
+
+@media (hover: none) {
+  .row-grip, .row-acts, .col-tools, .blk-tools { opacity: 1; pointer-events: auto; }
+}
+
+/* status definitions */
+.blk-defs { padding: 0.2in 0.5in 0.04in; }
+.defs-inner { border-top: 1px solid var(--line); padding: 11px 0 0; }
+.defs-title { font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--ink-mute); margin: 0 0 8px; }
+.defs-grid { column-count: 3; column-gap: 0.19in; }
+.def {
+  break-inside: avoid; -webkit-column-break-inside: avoid;
+  margin: 0 0 7px; font-size: 9.3px; line-height: 1.45; color: var(--ink-soft);
+}
+.def b { font-weight: 700; }
+/* Zero-width inline button. Absolute positioning inside a multi-column
+   block stops Chrome from balancing the columns, so it stays in the flow. */
+.def-x {
+  width: 18px; height: 18px; margin-right: -18px; vertical-align: -5px;
+  transform: translateX(3px);
+  opacity: 0; pointer-events: none; transition: opacity .12s;
+}
+.def:hover .def-x, .def-x:focus-visible { opacity: 1; pointer-events: auto; }
+.defs-hint { margin: 2px 0 6px; font-size: 11px; color: var(--ink-mute); font-style: italic; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.defs-hint .link-btn { font-style: normal; color: var(--magenta); font-size: 11px; }
+
+/* note */
+.blk-note { padding: 0.16in 0.5in 0.02in; }
+.note-card { background: var(--tint); border-radius: 13px; padding: 10px 14px 11px; }
+.note-title { margin: 0 0 4px; font-size: 9px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; color: var(--magenta); }
+.note-text { font-size: 11px; line-height: 1.5; color: var(--ink); white-space: pre-wrap; font-weight: 500; }
+
+/* footer */
+.foot {
+  --ph: rgba(255,255,255,.5); --hov: rgba(255,255,255,.42); --foc: var(--gold);
+  flex: none; margin-top: auto; background: var(--purple); color: #FFFFFF;
+  padding: 0.2in 0.5in 0.18in;
+}
+.foot-card { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.foot-ask { font-size: 11px; line-height: 1.45; color: #F0E2F0; font-weight: 600; }
+.foot-ask em { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--gold); font-size: 13.5px; }
+.foot-rep { text-align: right; font-size: 10px; line-height: 1.52; color: #D6BFD7; flex: none; }
+.foot-rep .rep-name { font-weight: 700; color: #FFFFFF; font-size: 11.5px; }
+.legal {
+  margin: 12px 0 0; padding: 9px 0 0; border-top: 1px solid rgba(255,255,255,.17);
+  font-size: 7.6px; line-height: 1.45; color: rgba(255,255,255,.6);
+  display: flex; justify-content: space-between; gap: 14px;
+}
+
+/* tighter rows when the rep turns on "Fit more names" */
+.sheet.compact .row { padding: 3px 12px 3px; }
+.sheet.compact .name { font-size: 11px; line-height: 1.24; }
+.sheet.compact .status { font-size: 9px; margin-top: 1px; }
+.sheet.compact .col-note { padding: 5px 12px 6px; }
+.sheet.compact .rows { padding: 2px 0 4px; }
+
+/* where the printed page ends */
+.pagemark { position: absolute; left: 0; right: 0; top: 0; height: 11in; pointer-events: none; z-index: 6; }
+.sheet.over .pagemark { border-bottom: 2px dashed var(--bad); }
+.sheet.over .pagemark::before {
+  content: 'Page ends here. Anything below this line gets cut off.';
+  position: absolute; right: 12px; bottom: 6px;
+  background: var(--bad); color: #FFFFFF; font: 700 11px var(--sans);
+  padding: 4px 10px; border-radius: 50px;
+}
+.sheet.over .pagemark::after {
+  content: ''; position: absolute; top: 100%; left: 0; right: 0; height: 300vh;
+  background: repeating-linear-gradient(-45deg, rgba(163,39,31,.1) 0 10px, rgba(163,39,31,.03) 10px 20px);
+}
+
+/* drag and drop */
+.is-ghost { opacity: .35; }
+.row.is-ghost { background: var(--tint); opacity: .7; }
+.sheet .tile {
+  border: 2px dashed var(--magenta); border-radius: 13px; background: rgba(146,56,149,.06);
+  min-height: 56px; margin: 10px 0.5in; padding: 0; justify-content: center; box-shadow: none; transform: none;
+}
+.sheet .cols > .tile { margin: 0; }
+.sheet .tile > * { display: none; }
+.sheet .tile::after { content: 'Drop to add it here'; color: var(--magenta); font: 700 12px var(--sans); }
+@keyframes flash { from { box-shadow: 0 0 0 4px rgba(241,211,50,.95); } to { box-shadow: 0 0 0 4px rgba(241,211,50,0); } }
+.flash { animation: flash 1.4s ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .flash { animation: none; }
+  .tile, .tile:hover { transition: none; transform: none; }
+}
+
+/* ================= floating pieces ================= */
+.menu {
+  position: fixed; z-index: 220; min-width: 236px; max-width: 290px; max-height: min(72vh, 480px); overflow: auto;
+  background: #FFFFFF; border: 1px solid var(--panel-line); border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(64,20,63,.24); padding: 6px;
+}
+.menu-head { padding: 8px 10px 2px; font-size: 12px; font-weight: 700; color: var(--purple-d); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.menu-sec { display: flex; align-items: center; gap: 8px; padding: 10px 10px 4px; font: 700 10.5px var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); }
+.menu-item {
+  appearance: none; display: flex; align-items: center; gap: 8px; width: 100%; text-align: left;
+  padding: 8px 10px; border: 0; border-radius: 9px; background: none; cursor: pointer;
+  font: 500 13.5px var(--sans); color: var(--ink);
+}
+.menu-item:hover, .menu-item:focus-visible { background: var(--tint); outline: none; }
+.menu-item .ck { width: 14px; flex: none; color: var(--magenta); display: grid; place-items: center; }
+.menu-item.is-current { font-weight: 700; color: var(--purple); }
+.menu-item.danger { color: var(--bad); }
+.menu-sep { height: 1px; background: var(--panel-line); margin: 6px 4px; }
+
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%); z-index: 300;
+  bottom: max(20px, env(safe-area-inset-bottom, 0px));
+  display: flex; align-items: center; gap: 14px;
+  max-width: calc(100vw - 32px); padding: 9px 9px 9px 18px; border-radius: 50px;
+  background: var(--purple-d); color: #FFFFFF; font-size: 13.5px; line-height: 1.35;
+  box-shadow: 0 10px 30px rgba(64,20,63,.35);
+}
+.toast.no-undo { padding-right: 18px; }
+.toast button {
+  appearance: none; border: 0; cursor: pointer; flex: none;
+  height: 30px; padding: 0 14px; border-radius: 50px; background: var(--gold); color: #333333; font: 700 12.5px var(--sans);
+}
+@keyframes rise { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.toast.show { animation: rise .2s ease-out; }
+
+.panel {
+  position: fixed; z-index: 160; top: 70px;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  width: min(420px, calc(100vw - 32px)); max-height: calc(100vh - 90px); overflow: auto;
+  background: #FFFFFF; border-radius: 18px; box-shadow: 0 20px 50px rgba(64,20,63,.3); padding: 18px;
+}
+.panel h3, .dialog h3 { margin: 0; font: 600 20px/1.2 var(--sans); color: var(--purple); }
+.panel h3 em, .dialog h3 em { font-family: var(--serif); font-style: italic; font-weight: 400; color: var(--magenta); font-size: 1.15em; }
+.panel .sub { margin: 4px 0 12px; font-size: 12.5px; line-height: 1.45; color: var(--body-soft); }
+.sh-list { list-style: none; margin: 0 0 14px; padding: 0; display: grid; gap: 8px; }
+.sh-item { display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 12px; border: 1px solid var(--panel-line); border-radius: 12px; }
+.sh-item.is-current { border-color: var(--magenta); background: var(--tint); }
+.sh-main { flex: 1; min-width: 0; }
+.sh-name { font-weight: 600; font-size: 14px; color: var(--purple-d); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sh-meta { font-size: 12px; color: var(--ink-mute); margin-top: 1px; }
+.sh-acts { display: flex; align-items: center; gap: 6px; flex: none; flex-wrap: wrap; justify-content: flex-end; }
+.sh-q { font-size: 12.5px; font-weight: 600; color: var(--bad); }
+.sh-badge { font-size: 11.5px; font-weight: 700; color: var(--magenta); padding: 0 4px; }
+.sh-empty { padding: 14px; border: 1px dashed var(--panel-line); border-radius: 12px; font-size: 13px; color: var(--body-soft); text-align: center; }
+.panel-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.sbtn {
+  appearance: none; height: 32px; padding: 0 13px; border-radius: 50px; cursor: pointer;
+  border: 1px solid var(--panel-line); background: #FFFFFF; color: var(--purple); font: 600 12.5px var(--sans); white-space: nowrap;
+}
+.sbtn:hover { border-color: var(--magenta); }
+.sbtn.solid { background: var(--purple); border-color: var(--purple); color: #FFFFFF; }
+.sbtn.primary { background: var(--lime); border-color: var(--lime); color: #333333; font-weight: 700; }
+.sbtn.danger { color: var(--bad); }
+.sbtn.danger.solid { background: var(--bad); border-color: var(--bad); color: #FFFFFF; }
+.sbtn.quiet { border-color: transparent; color: var(--bad); }
+
+.modal { position: fixed; inset: 0; z-index: 250; background: rgba(40,12,40,.45); display: grid; place-items: center; padding: 16px; }
+.dialog { width: min(500px, 100%); max-height: calc(100vh - 32px); overflow: auto; background: #FFFFFF; border-radius: 20px; padding: 22px; box-shadow: 0 30px 80px rgba(40,12,40,.4); }
+.dialog .sub { margin: 6px 0 0; font-size: 13.5px; color: var(--body-soft); line-height: 1.45; }
+.issues { list-style: none; margin: 16px 0; padding: 0; display: grid; gap: 8px; }
+.issue { display: flex; align-items: center; gap: 10px; padding: 10px 10px 10px 12px; background: var(--field); border-radius: 12px; font-size: 13.5px; line-height: 1.4; }
+.issue .ic { color: #C2620F; flex: none; display: grid; }
+.issue .tx { flex: 1; }
+.dialog .tip { margin: 14px 0 16px; padding: 10px 12px; border-radius: 12px; background: var(--tint); font-size: 12.5px; line-height: 1.45; color: var(--body-soft); }
+.dialog .tip b { color: var(--purple-d); }
+.dialog-btns { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.dialog-btns .sbtn { height: 38px; padding: 0 18px; font-size: 13.5px; }
+
+/* ================= narrow screens ================= */
+@media (max-width: 980px) {
+  .app { display: block; }
+  .side { position: static; height: auto; overflow: visible; border-right: 0; border-bottom: 1px solid var(--panel-line); padding-right: max(20px, env(safe-area-inset-right, 0px)); }
+}
+@media (max-width: 760px) {
+  .app-name, .tb .lbl { display: none; }
+  .tb { padding: 0 11px; }
+  .tb.primary .lbl-short { display: inline; }
+  .sheetbar .hint-inline { display: none; }
+}
+.lbl-short { display: none; }
+
+/* ================= print: only the sheet ================= */
+@media print {
+  html, body { background: #FFFFFF !important; }
+  .top, .side, .sheetbar, .sample-bar, .toast, .menu, .modal, .panel, .screen { display: none !important; }
+  .app { display: block; }
+  .desk { padding: 0 !important; }
+  .desk-inner { width: auto !important; margin: 0; }
+  .stage { zoom: 1 !important; width: auto; }
+  .sheet { box-shadow: none; height: 11in; min-height: 0; margin: 0; break-after: avoid; }
+  .pagemark { display: none; }
+  .sheet [contenteditable], .sheet [contenteditable]:hover, .sheet [contenteditable]:focus, .period, .st-btn { box-shadow: none !important; }
+  .sheet [data-ph]:empty::before { content: none !important; }
+  .row:has(> .name:empty) { display: none; }
+  .status:has(.st-empty) { display: none; }
+  .col-note:empty { display: none; }
+  .blk.is-empty { display: none; }
+  .period.is-blank { visibility: hidden; }
+  .rep-line:not(.both) .rep-dot { display: none; }
+  .flash { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <img src="data:image/webp;base64,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" alt="The Treetop ABA Therapy Center">
+    <span class="app-name">Referral Update <em>builder</em></span>
+  </div>
+  <span class="spacer"></span>
+  <button type="button" class="tb icon" id="btnUndo" aria-label="Undo" title="Undo">
+    <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><path d="M7.5 4.5 3.5 8.5l4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 8.5h8a4.5 4.5 0 0 1 0 9H9.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </button>
+  <button type="button" class="tb icon" id="btnRedo" aria-label="Redo" title="Redo">
+    <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><path d="m12.5 4.5 4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 8.5H8a4.5 4.5 0 0 0 0 9h2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </button>
+  <button type="button" class="tb" id="btnSheets" aria-haspopup="dialog" aria-expanded="false">
+    <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="M2.5 5.5a2 2 0 0 1 2-2h3.2l2 2h5.8a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+    <span class="lbl">My sheets</span>
+  </button>
+  <button type="button" class="tb" id="btnNew">
+    <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+    <span class="lbl">New sheet</span>
+  </button>
+  <button type="button" class="tb primary" id="btnPrint">
+    <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 7.5V3h9v4.5M5.5 14H4a1.5 1.5 0 0 1-1.5-1.5v-4A1.5 1.5 0 0 1 4 7h12a1.5 1.5 0 0 1 1.5 1.5v4A1.5 1.5 0 0 1 16 14h-1.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M5.5 11.5h9V17h-9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+    <span class="lbl">Print / Save PDF</span><span class="lbl-short">Print</span>
+  </button>
+</header>
+
+<div class="app">
+  <aside class="side" id="side" aria-label="Sheet controls">
+
+    <section class="tips" id="tips" aria-labelledby="h-tips">
+      <h2 id="h-tips">How it <em>works</em></h2>
+      <ol>
+        <li><span>Type the <b>doctor's name</b> and pick the dates.</span></li>
+        <li><span>Click <b>Add a child</b> under the right column. Drag the dots to move a child, or click their status to change it.</span></li>
+        <li><span>Click <b>Print / Save PDF</b>, then set the destination to <b>Save as PDF</b>.</span></li>
+      </ol>
+      <div class="tips-acts">
+        <button type="button" class="chip-btn" id="btnExample">See an example</button>
+        <button type="button" class="link-btn" id="btnHideTips">Hide tips</button>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="h-sheet">
+      <h2 id="h-sheet">This sheet</h2>
+      <div class="field">
+        <label for="f-doctor">Doctor's name</label>
+        <input type="text" id="f-doctor" placeholder="Dr. Alvarez" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="two">
+        <div class="field"><label for="f-from">From</label><input type="date" id="f-from"></div>
+        <div class="field"><label for="f-to">To</label><input type="date" id="f-to"></div>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="h-add">
+      <h2 id="h-add">Add to the page</h2>
+      <p class="hint">Click a card to add it, or drag it onto the page. Remove anything on the page with its <b>&times;</b> button.</p>
+
+      <p class="lib-label">Columns</p>
+      <div class="lib" id="libCols">
+        <div class="tile" role="button" tabindex="0" data-add="col-care">
+          <span class="sw" style="background:#CBDB2F"></span>
+          <span class="tx"><span class="t1">In Care</span><span class="t2">Names only</span></span>
+          <span class="st"></span>
+        </div>
+        <div class="tile" role="button" tabindex="0" data-add="col-progress">
+          <span class="sw" style="background:#78C2DE"></span>
+          <span class="tx"><span class="t1">In Progress</span><span class="t2">Name and status</span></span>
+          <span class="st"></span>
+        </div>
+        <div class="tile" role="button" tabindex="0" data-add="col-attention">
+          <span class="sw" style="background:#F79445"></span>
+          <span class="tx"><span class="t1">Needs Attention</span><span class="t2">Name and what is stuck</span></span>
+          <span class="st"></span>
+        </div>
+        <div class="tile" role="button" tabindex="0" data-add="col-custom">
+          <span class="sw dashed"><svg width="12" height="12" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>
+          <span class="tx"><span class="t1">Your own column</span><span class="t2">Name it anything</span></span>
+          <span class="st"></span>
+        </div>
+      </div>
+
+      <p class="lib-label">Sections</p>
+      <div class="lib" id="libSecs">
+        <div class="tile" role="button" tabindex="0" data-add="defs">
+          <span class="sw soft"><svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 5h12M4 10h12M4 15h8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg></span>
+          <span class="tx"><span class="t1">What each status means</span><span class="t2">A plain-language key</span></span>
+          <span class="st"></span>
+        </div>
+        <div class="tile" role="button" tabindex="0" data-add="note">
+          <span class="sw soft"><svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><path d="M13.5 3.5l3 3L7 16H4v-3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg></span>
+          <span class="tx"><span class="t1">Note to the doctor</span><span class="t2">A short personal message</span></span>
+          <span class="st"></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="h-rep">
+      <h2 id="h-rep">Your contact info</h2>
+      <p class="hint">Prints in the footer. Saved on this computer for your next sheet.</p>
+      <div class="field"><label for="f-rep-name">Your name</label><input type="text" id="f-rep-name" autocomplete="name" spellcheck="false"></div>
+      <div class="field"><label for="f-rep-title">Your title</label><input type="text" id="f-rep-title" autocomplete="organization-title"></div>
+      <div class="field"><label for="f-rep-email">Email</label><input type="email" id="f-rep-email" autocomplete="email" spellcheck="false"></div>
+      <div class="field"><label for="f-rep-phone">Phone</label><input type="tel" id="f-rep-phone" autocomplete="tel"></div>
+    </section>
+
+    <section class="sec" aria-labelledby="h-opts">
+      <h2 id="h-opts">Page options</h2>
+      <label class="opt" for="o-compact">
+        <input type="checkbox" id="o-compact">
+        <span><span class="o1">Fit more names</span><span class="o2">Tighter rows, so a long list still fits on one page.</span></span>
+      </label>
+      <label class="opt" for="o-used">
+        <input type="checkbox" id="o-used">
+        <span><span class="o1">Only explain statuses in use</span><span class="o2">The key lists just the statuses on this sheet.</span></span>
+      </label>
+    </section>
+
+    <div class="privacy">
+      <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="9" width="12" height="8.5" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M7 9V6.5a3 3 0 0 1 6 0V9" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+      <span><b>Names stay on this computer.</b> Nothing you type is sent anywhere. Sheets save in this browser only, and you can delete them anytime from My sheets.</span>
+    </div>
+    <p class="side-foot" id="showTipsWrap" hidden><button type="button" class="link-btn" id="btnShowTips">Show how it works</button></p>
+  </aside>
+
+  <main class="desk" id="desk">
+    <div class="desk-inner">
+      <div class="sample-bar" id="sampleBar" hidden>
+        <span><b>This is an example.</b> The names are made up. Start your own sheet before you print.</span>
+        <button type="button" class="chip-btn" id="btnStartOwn">Start my own sheet</button>
+      </div>
+      <div class="sheetbar">
+        <span class="pill ok" id="fitPill" role="status"></span>
+        <button type="button" class="pill-btn" id="fitFix" hidden>Fit more names</button>
+        <span class="hint-inline">Click any text on the page to change it.</span>
+      </div>
+      <div class="stage" id="stage">
+        <article class="sheet" id="sheet" aria-label="Referral update page"></article>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="menu" id="menu" role="menu" hidden></div>
+
+<div class="panel" id="sheetsPanel" role="dialog" aria-labelledby="h-sheets" hidden>
+  <h3 id="h-sheets">My <em>sheets</em></h3>
+  <p class="sub">Sheets save on their own as you type. Open one to update it, or copy it to start next month's version. Sheets you have not opened in 90 days are deleted automatically.</p>
+  <ul class="sh-list" id="shList"></ul>
+  <div class="panel-foot">
+    <button type="button" class="sbtn solid" id="shNew">Start a new sheet</button>
+    <span id="shDelAllWrap"><button type="button" class="sbtn quiet" id="shDelAll">Delete all</button></span>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h3 id="modalTitle">Before you <em>print</em></h3>
+    <p class="sub" id="modalIntro"></p>
+    <ul class="issues" id="issues"></ul>
+    <p class="tip">In the print window, set the destination to <b>Save as PDF</b> to get a file you can email or attach.</p>
+    <div class="dialog-btns">
+      <button type="button" class="sbtn" id="btnBack">Go back</button>
+      <button type="button" class="sbtn primary" id="btnPrintGo">Print anyway</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden>
+  <span id="toastMsg"></span>
+  <button type="button" id="toastUndo">Undo</button>
+</div>
+
+<noscript><p style="padding:20px;font:15px sans-serif">This builder needs JavaScript turned on.</p></noscript>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---------------------------------------------------------------
+     Content rules. The column names, status labels and the plain
+     language meanings are the approved one-pager wording. Change
+     them here, not on the page, so every rep gets the same words.
+     --------------------------------------------------------------- */
+  const LOGO = document.querySelector('.brand img').getAttribute('src');
+
+  const PALETTE = {
+    lime:   { accent: '#CBDB2F', ink: '#5E6B0C' },
+    teal:   { accent: '#78C2DE', ink: '#2E7898' },
+    orange: { accent: '#F79445', ink: '#A8550F' },
+    pink:   { accent: '#D97BA3', ink: '#9C3D68' },
+    gold:   { accent: '#F1D332', ink: '#7A6500' }
+  };
+  const COLOR_ORDER = ['lime', 'teal', 'orange', 'pink', 'gold'];
+  const MAX_COLS = 4;
+
+  const PRESETS = {
+    care: {
+      title: 'In Care', note: 'Therapy is underway.', color: 'lime', statuses: []
+    },
+    progress: {
+      title: 'In Progress', note: 'Actively moving toward a start date.', color: 'teal',
+      statuses: ['In assessment', 'Verifying benefits', 'Finalizing paperwork', 'Matching a BCBA']
+    },
+    attention: {
+      title: 'Needs Attention', note: 'Stuck on something we cannot resolve alone.', color: 'orange',
+      statuses: ['Needs a diagnosis', 'Insurance review', 'Unable to reach family', 'Services paused']
+    }
+  };
+  const PRESET_ORDER = ['care', 'progress', 'attention'];
+
+  const DEFS = [
+    { id: 'care', label: 'In care', preset: 'care', covers: null,
+      text: 'Therapy is underway and going well. We will keep you posted on new milestones, and the assigned BCBA is always glad to talk through progress.' },
+    { id: 'assess', label: 'In assessment', preset: 'progress', covers: ['In assessment'],
+      text: 'Assessment is in progress and the care plan is being prepared for insurance submission. This is the last step before therapy begins.' },
+    { id: 'benefits', label: 'Verifying benefits and finalizing paperwork', preset: 'progress', covers: ['Verifying benefits', 'Finalizing paperwork'],
+      text: 'We are in regular contact with the family and are collecting the last documentation needed to move forward.' },
+    { id: 'match', label: 'Matching a BCBA', preset: 'progress', covers: ['Matching a BCBA'],
+      text: 'We are matching the right clinic and the right BCBA, and watching capacity closely so we can move the moment an opening comes up.' },
+    { id: 'dx', label: 'Needs a diagnosis or insurance review', preset: 'attention', covers: ['Needs a diagnosis', 'Insurance review'],
+      text: 'Either there is no autism diagnosis on file yet, in which case we help the family find a provider who can complete one, or we are still working through insurance.' },
+    { id: 'reach', label: 'Unable to reach family', preset: 'attention', covers: ['Unable to reach family'],
+      text: 'We have reached out and have not connected yet. We will keep trying, and will call you directly if we continue to have trouble.' },
+    { id: 'paused', label: 'Services paused', preset: 'attention', covers: ['Services paused'],
+      text: 'This can follow a change in coverage, a family request, or a temporary change such as a pending restart, reschedule, or transfer to another clinic.' }
+  ];
+
+  // Example data. Made-up names, never real patients.
+  const SAMPLE_KIDS = {
+    care: [['Emma Smith', ''], ['Jack Jones', ''], ['Liam Carter', ''], ['Ava Nguyen', '']],
+    progress: [['Sarah Williams', 'In assessment'], ['Mateo Rivera', 'In assessment'], ['Grace Bennett', 'Verifying benefits'],
+      ['Elijah Foster', 'Finalizing paperwork'], ['Olivia Davis', 'Matching a BCBA'], ['Henry Park', 'Matching a BCBA']],
+    attention: [['Michael Brown', 'Needs a diagnosis'], ['Zoe Martinez', 'Unable to reach family'], ['Noah Wilson', 'Services paused']]
+  };
+  const SAMPLE_REP = { name: 'Jordan Ellis', title: 'Business Development', email: 'your.name@thetreetop.com', phone: '(555) 010-4820' };
+
+  const K_SHEETS = 'treetop.referralBuilder.sheets.v1';
+  const K_REP = 'treetop.referralBuilder.rep.v1';
+  const K_TIPS = 'treetop.referralBuilder.tipsHidden.v1';
+  const KEEP_DAYS = 90;
+  const BASE_TITLE = document.title;
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+  /* ---------------- small helpers ---------------- */
+  const $ = (sel, root) => (root || document).querySelector(sel);
+  const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+  const uid = () => Math.random().toString(36).slice(2, 10);
+  const later = fn => setTimeout(fn, 0);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const plural = (n, one, many) => n + ' ' + (n === 1 ? one : many);
+
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  };
+
+  // Plain-text editing keeps pasted formatting out of the sheet.
+  const CE = (() => {
+    try { const d = document.createElement('div'); d.contentEditable = 'plaintext-only'; return d.contentEditable === 'plaintext-only' ? 'plaintext-only' : 'true'; }
+    catch (e) { return 'true'; }
+  })();
+
+  function isoDate(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function parseIso(s) { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ''); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; }
+  function longDate(d, withYear) { return MONTHS[d.getMonth()] + ' ' + d.getDate() + (withYear === false ? '' : ', ' + d.getFullYear()); }
+  function monthsAgo(n) { const d = new Date(); d.setMonth(d.getMonth() - n); return d; }
+  function periodText(from, to) {
+    const a = parseIso(from), b = parseIso(to);
+    if (!a && !b) return '';
+    if (a && !b) return 'Since ' + longDate(a);
+    if (!a && b) return 'Through ' + longDate(b);
+    if (a.getFullYear() === b.getFullYear()) return longDate(a, false) + ' to ' + longDate(b);
+    return longDate(a) + ' to ' + longDate(b);
+  }
+  function relDate(ts) {
+    const d = new Date(ts || Date.now());
+    const days = Math.round((new Date(new Date().toDateString()) - new Date(d.toDateString())) / 864e5);
+    if (days <= 0) return 'today';
+    if (days === 1) return 'yesterday';
+    return MONTHS[d.getMonth()].slice(0, 3) + ' ' + d.getDate();
+  }
+
+  const I = {
+    grip: '<svg width="8" height="13" viewBox="0 0 10 16" aria-hidden="true"><g fill="currentColor"><circle cx="2.5" cy="3" r="1.5"/><circle cx="7.5" cy="3" r="1.5"/><circle cx="2.5" cy="8" r="1.5"/><circle cx="7.5" cy="8" r="1.5"/><circle cx="2.5" cy="13" r="1.5"/><circle cx="7.5" cy="13" r="1.5"/></g></svg>',
+    gripH: '<svg width="13" height="9" viewBox="0 0 16 10" aria-hidden="true"><g fill="currentColor"><circle cx="3" cy="2.5" r="1.5"/><circle cx="8" cy="2.5" r="1.5"/><circle cx="13" cy="2.5" r="1.5"/><circle cx="3" cy="7.5" r="1.5"/><circle cx="8" cy="7.5" r="1.5"/><circle cx="13" cy="7.5" r="1.5"/></g></svg>',
+    x: '<svg width="9" height="9" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+    plus: '<svg width="10" height="10" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>',
+    more: '<svg width="11" height="11" viewBox="0 0 20 20" aria-hidden="true"><g fill="currentColor"><circle cx="4" cy="10" r="2"/><circle cx="10" cy="10" r="2"/><circle cx="16" cy="10" r="2"/></g></svg>',
+    caret: '<svg width="7" height="5" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    check: '<svg width="12" height="12" viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10.5l4 4 8-9" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    alert: '<svg width="15" height="15" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2.8 18 16.5H2z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M10 8v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="14.4" r="1" fill="currentColor"/></svg>',
+    pencil: '<svg width="13" height="13" viewBox="0 0 20 20" aria-hidden="true"><path d="M13.5 3.5l3 3L7 16H4v-3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>'
+  };
+
+  /* ---------------- sheet model ---------------- */
+  function makeCol(preset, usedColors) {
+    const p = PRESETS[preset];
+    if (p) return { id: uid(), preset: preset, title: p.title, note: p.note, color: p.color, kids: [] };
+    const color = COLOR_ORDER.find(c => !(usedColors || []).includes(c)) || 'pink';
+    return { id: uid(), preset: 'custom', title: '', note: '', color: color, kids: [] };
+  }
+  function makeDefs() { return { id: uid(), type: 'defs', title: 'What each status means', mode: 'used', hidden: [] }; }
+  function makeNote() { return { id: uid(), type: 'note', title: 'A note from your Treetop team', text: '' }; }
+
+  function blankSheet() {
+    const rep = store.get(K_REP, null) || {};
+    return {
+      v: 1, id: uid(), sample: false, updated: Date.now(),
+      doctor: '', from: isoDate(monthsAgo(6)), to: isoDate(new Date()),
+      eyebrow: 'Referral Update',
+      lead: ', here is how your',
+      accent: 'patients are doing.',
+      subtitle: 'Below is where each one stands today, so you have an answer the moment a parent asks.',
+      ask: 'Questions about any of these families, or want to send a new referral?',
+      askAccent: 'Just reach out. We answer the same day.',
+      compact: false,
+      rep: { name: rep.name || '', title: rep.title != null ? rep.title : 'Business Development', email: rep.email || '', phone: rep.phone || '' },
+      blocks: [{ id: uid(), type: 'cols', cols: PRESET_ORDER.map(p => makeCol(p)) }, makeDefs()]
+    };
+  }
+
+  function sampleSheet() {
+    const s = blankSheet();
+    s.sample = true;
+    s.doctor = 'Dr. Alvarez';
+    colsBlock(s).cols.forEach(c => {
+      c.kids = (SAMPLE_KIDS[c.preset] || []).map(r => ({ id: uid(), name: r[0], status: r[1], custom: false }));
+    });
+    if (!s.rep.name.trim()) s.rep = Object.assign({}, SAMPLE_REP);
+    return s;
+  }
+
+  function migrate(src) {
+    const b = blankSheet();
+    const s = Object.assign({}, b, src);
+    s.rep = Object.assign({}, b.rep, src.rep || {});
+    if (!Array.isArray(s.blocks)) s.blocks = b.blocks;
+    if (!s.blocks.some(x => x.type === 'cols')) s.blocks.unshift({ id: uid(), type: 'cols', cols: [] });
+    s.blocks.forEach(x => {
+      if (x.type === 'cols') x.cols.forEach(c => { c.kids = c.kids || []; c.kids.forEach(k => { k.name = k.name || ''; k.status = k.status || ''; }); });
+      if (x.type === 'defs') { x.hidden = x.hidden || []; x.mode = x.mode || 'used'; }
+      if (x.type === 'note') { x.text = x.text || ''; x.title = x.title == null ? '' : x.title; }
+    });
+    return s;
+  }
+
+  let S = null;
+  let undoStack = [], redoStack = [], editSnap = null;
+
+  function colsBlock(s) { return (s || S).blocks.find(b => b.type === 'cols'); }
+  function allCols(s) { const b = colsBlock(s); return b ? b.cols : []; }
+  function allKids(s) { return allCols(s).reduce((a, c) => a.concat(c.kids), []); }
+  function named(kids) { return kids.filter(k => k.name.trim()).length; }
+  function findCol(id) { return allCols().find(c => c.id === id); }
+  function findBlock(id) { return S.blocks.find(b => b.id === id); }
+  function findKid(id) {
+    for (const c of allCols()) { const i = c.kids.findIndex(k => k.id === id); if (i > -1) return { col: c, kid: c.kids[i], index: i }; }
+    return null;
+  }
+  function showsStatus(c) { return c.preset !== 'care'; }
+  function statusOptions(c) { return PRESETS[c.preset] ? PRESETS[c.preset].statuses : []; }
+  function isFree(c, k) { return showsStatus(c) && (k.custom || statusOptions(c).length === 0); }
+  function pal(c) { return PALETTE[c.color] || PALETTE.lime; }
+  function inkForPreset(p) { const c = allCols().find(x => x.preset === p); return c ? pal(c).ink : PALETTE[PRESETS[p].color].ink; }
+  function colLabel(c) { return c.title.trim() || 'Untitled column'; }
+
+  /* ---------------- history and saving ---------------- */
+  function snapshot() { return JSON.stringify(S); }
+  function pushUndo(snap) { undoStack.push(snap); if (undoStack.length > 100) undoStack.shift(); redoStack = []; }
+  function flushEdit() {
+    if (editSnap !== null && editSnap !== snapshot()) pushUndo(editSnap);
+    editSnap = null;
+    updateChrome();
+  }
+  function commit(fn) {
+    flushEdit();
+    const before = snapshot();
+    fn(S);
+    if (snapshot() === before) return false;
+    pushUndo(before);
+    touch();
+    render();
+    return true;
+  }
+  function blurEditing() { const a = document.activeElement; if (a && isEditable(a)) a.blur(); }
+  function undo() {
+    blurEditing();
+    if (!undoStack.length) return;
+    redoStack.push(snapshot());
+    S = JSON.parse(undoStack.pop());
+    touch(); render();
+  }
+  function redo() {
+    blurEditing();
+    if (!redoStack.length) return;
+    undoStack.push(snapshot());
+    S = JSON.parse(redoStack.pop());
+    touch(); render();
+  }
+  function resetHistory() { undoStack = []; redoStack = []; editSnap = null; }
+
+  let saveTimer = null;
+  function touch() { S.updated = Date.now(); clearTimeout(saveTimer); saveTimer = setTimeout(saveNow, 300); }
+  function readDB() { const db = store.get(K_SHEETS, null); return db && typeof db === 'object' && db.sheets ? db : { current: null, sheets: {} }; }
+  function hasContent(s) { return !!(s.doctor.trim() || allKids(s).some(k => k.name.trim()) || s.blocks.some(b => b.type === 'note' && b.text.trim())); }
+  function saveNow() {
+    clearTimeout(saveTimer);
+    if (!S || S.sample) return;
+    const db = readDB();
+    if (hasContent(S)) db.sheets[S.id] = S; else delete db.sheets[S.id];
+    db.current = S.id;
+    store.set(K_SHEETS, db);
+  }
+  function saveRep() { if (!S.sample) store.set(K_REP, S.rep); }
+  function loadInitial() {
+    const db = readDB();
+    const cutoff = Date.now() - KEEP_DAYS * 864e5;
+    Object.keys(db.sheets).forEach(id => { const s = db.sheets[id]; if (!s || !s.blocks || (s.updated || 0) < cutoff) delete db.sheets[id]; });
+    store.set(K_SHEETS, db);
+    const cur = db.current && db.sheets[db.current];
+    return cur ? migrate(cur) : blankSheet();
+  }
+
+  /* ---------------- rendering ---------------- */
+  const sheetEl = $('#sheet');
+  let sortables = [];
+
+  const ed = f => `contenteditable="${CE}" data-f="${f}"`;
+  const edRep = f => `contenteditable="${CE}" data-rep="${f}"`;
+  const edCol = f => `contenteditable="${CE}" data-colf="${f}"`;
+  const edKid = f => `contenteditable="${CE}" data-kidf="${f}"`;
+  const edBlk = f => `contenteditable="${CE}" data-blkf="${f}"`;
+
+  function headHTML() {
+    return `<header class="head">
+      <div class="head-row">
+        <img class="logo" src="${LOGO}" alt="The Treetop ABA Therapy Center">
+        <div class="head-meta">
+          <p class="eyebrow" ${ed('eyebrow')} data-ph="Referral Update">${esc(S.eyebrow)}</p>
+          <button type="button" class="period" data-act="dates" title="Change the dates"></button>
+        </div>
+      </div>
+      <h1 class="title"><span ${ed('doctor')} data-ph="Dr. Last name" spellcheck="false">${esc(S.doctor)}</span><span ${ed('lead')}>${esc(S.lead)}</span> <em ${ed('accent')}>${esc(S.accent)}</em></h1>
+      <p class="subtitle"><strong data-out="count"></strong> <span data-out="countRest"></span>
+        <span ${ed('subtitle')}>${esc(S.subtitle)}</span></p>
+    </header>`;
+  }
+
+  function footHTML() {
+    const r = S.rep;
+    return `<footer class="foot">
+      <div class="foot-card">
+        <div class="foot-ask"><span ${ed('ask')}>${esc(S.ask)}</span><br><em ${ed('askAccent')}>${esc(S.askAccent)}</em></div>
+        <div class="foot-rep">
+          <div class="rep-name" ${edRep('name')} data-ph="Your name" spellcheck="false">${esc(r.name)}</div>
+          <div ${edRep('title')} data-ph="Your title">${esc(r.title)}</div>
+          <div class="rep-line"><span ${edRep('email')} data-ph="you@thetreetop.com" spellcheck="false">${esc(r.email)}</span><span class="rep-dot"> &nbsp;&middot;&nbsp; </span><span ${edRep('phone')} data-ph="Phone" spellcheck="false">${esc(r.phone)}</span></div>
+        </div>
+      </div>
+      <div class="legal">
+        <span>Confidential. Contains protected health information intended only for the referring provider named above.</span>
+        <span data-out="generated"></span>
+      </div>
+    </footer>`;
+  }
+
+  function blkTools(removable, what) {
+    return `<div class="blk-tools screen">
+      <button type="button" class="tbtn grip blk-grip" aria-label="Drag to move ${what}" title="Drag to move">${I.grip}</button>
+      ${removable ? `<button type="button" class="tbtn" data-act="rm-blk" aria-label="Remove ${what}" title="Remove">${I.x}</button>` : ''}
+    </div>`;
+  }
+
+  function kidHTML(k, c) {
+    let status = '';
+    if (showsStatus(c)) {
+      const ink = pal(c).ink;
+      if (isFree(c, k)) {
+        status = `<div class="status" style="color:${ink}"><span class="st-text" ${edKid('status')} data-ph="Type a status">${esc(k.status)}</span>${statusOptions(c).length ? `<button type="button" class="st-pick screen" data-act="menu" aria-label="Choose a status" title="Choose a status">${I.caret}</button>` : ''}</div>`;
+      } else {
+        status = `<div class="status" style="color:${ink}"><button type="button" class="st-btn" data-act="menu" aria-haspopup="menu" title="Change status">${k.status ? esc(k.status) : '<span class="st-empty">Pick a status</span>'}<span class="screen">${I.caret}</span></button></div>`;
+      }
+    }
+    return `<div class="row" data-kid="${k.id}">
+      <span class="row-grip screen" title="Drag to move" aria-hidden="true">${I.grip}</span>
+      <div class="name" ${edKid('name')} data-ph="Child's name" spellcheck="false">${esc(k.name)}</div>
+      ${status}
+      <div class="row-acts screen">
+        <button type="button" class="tbtn sm" data-act="menu" aria-label="Move or change status" title="Move or change status">${I.more}</button>
+        <button type="button" class="tbtn sm" data-act="rm-kid" aria-label="Remove this child" title="Remove">${I.x}</button>
+      </div>
+    </div>`;
+  }
+
+  function colHTML(c) {
+    const p = pal(c);
+    return `<div class="col" data-col="${c.id}">
+      <div class="col-tools screen">
+        <button type="button" class="tbtn grip col-grip" aria-label="Drag to move the ${esc(colLabel(c))} column" title="Drag to move">${I.gripH}</button>
+        <button type="button" class="tbtn" data-act="color" aria-label="Change color" title="Change color"><span class="swatch" style="background:${p.accent}"></span></button>
+        <button type="button" class="tbtn" data-act="rm-col" aria-label="Remove the ${esc(colLabel(c))} column" title="Remove column">${I.x}</button>
+      </div>
+      <div class="col-head" style="background:${p.accent}">
+        <span class="col-title" ${edCol('title')} data-ph="Column name">${esc(c.title)}</span>
+        <span class="col-count"></span>
+      </div>
+      <div class="col-note" ${edCol('note')} data-ph="Add a short description">${esc(c.note)}</div>
+      <div class="list">
+        <div class="rows" data-rows="${c.id}">
+          ${c.kids.map(k => kidHTML(k, c)).join('')}
+          <p class="empty">No children in this stage right now.</p>
+          <button type="button" class="add-kid screen" data-act="add-kid">${I.plus}<span>Add a child</span></button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function blockHTML(b) {
+    if (b.type === 'cols') {
+      return `<section class="blk blk-cols" data-blk="${b.id}">${blkTools(false, 'the columns')}
+        <div class="cols cols-${b.cols.length}" style="--n:${Math.max(1, b.cols.length)}">${b.cols.map(colHTML).join('')}${b.cols.length ? '' : '<div class="cols-empty screen">No columns yet. Add one from the panel on the left.</div>'}</div>
+      </section>`;
+    }
+    if (b.type === 'defs') {
+      return `<section class="blk blk-defs" data-blk="${b.id}">${blkTools(true, 'the status meanings')}
+        <div class="defs-inner">
+          <p class="defs-title" ${edBlk('title')} data-ph="What each status means">${esc(b.title)}</p>
+          <div class="defs-grid"></div>
+          <div class="defs-hint screen" hidden></div>
+        </div>
+      </section>`;
+    }
+    if (b.type === 'note') {
+      return `<section class="blk blk-note" data-blk="${b.id}">${blkTools(true, 'the note')}
+        <div class="note-card">
+          <p class="note-title" ${edBlk('title')} data-ph="Note title">${esc(b.title)}</p>
+          <div class="note-text" ${edBlk('text')} data-ph="Type a short note for the doctor, such as a family milestone or the best way to send a new referral.">${esc(b.text)}</div>
+        </div>
+      </section>`;
+    }
+    return '';
+  }
+
+  function render() {
+    closeMenu(false);
+    sortables.forEach(s => { try { s.destroy(); } catch (e) { /* already gone */ } });
+    sortables = [];
+    sheetEl.classList.toggle('compact', !!S.compact);
+    sheetEl.innerHTML = headHTML()
+      + `<div class="body" id="blocks">${S.blocks.map(blockHTML).join('')}</div>`
+      + footHTML()
+      + '<div class="pagemark" aria-hidden="true"></div>';
+    initSheetSortables();
+    updateDerived();
+  }
+
+  function usedStatuses() {
+    const set = new Set();
+    allCols().forEach(c => { if (showsStatus(c)) c.kids.forEach(k => { if (k.name.trim() && k.status.trim()) set.add(k.status.trim().toLowerCase()); }); });
+    return set;
+  }
+  function defUsed(d, used) {
+    if (!d.covers) return allCols().some(c => c.preset === 'care' && named(c.kids) > 0);
+    return d.covers.some(s => used.has(s.toLowerCase()));
+  }
+  function renderDefs(b, el) {
+    const used = usedStatuses();
+    const list = DEFS.filter(d => !b.hidden.includes(d.id) && (b.mode === 'all' || defUsed(d, used)));
+    const html = list.map(d => `<p class="def" data-def="${d.id}"><b style="color:${inkForPreset(d.preset)}">${esc(d.label)}:</b> ${esc(d.text)}<button type="button" class="tbtn sm def-x screen" data-act="hide-def" aria-label="Hide the meaning of ${esc(d.label)}" title="Hide this one">${I.x}</button></p>`).join('');
+    const grid = $('.defs-grid', el);
+    if (grid._html !== html) { grid.innerHTML = html; grid._html = html; }
+    el.classList.toggle('is-empty', !list.length);
+    const parts = [];
+    if (!list.length) parts.push(b.mode === 'used' && !b.hidden.length ? '<span>Meanings show up here as you give children a status.</span>' : '<span>Nothing to explain yet.</span>');
+    if (b.hidden.length) parts.push(`<button type="button" class="link-btn" data-act="show-defs">Show ${b.hidden.length} hidden</button>`);
+    const hint = $('.defs-hint', el);
+    const hh = parts.join('');
+    if (hint._html !== hh) { hint.innerHTML = hh; hint._html = hh; }
+    hint.hidden = !parts.length;
+  }
+
+  function setOut(name, text) { $$(`[data-out="${name}"]`, sheetEl).forEach(el => { if (el.textContent !== text) el.textContent = text; }); }
+
+  function updateDerived() {
+    const total = named(allKids());
+    setOut('count', total === 1 ? '1 child' : total + ' children');
+    setOut('countRest', 'you referred to The Treetop ' + (total === 1 ? 'is' : 'are') + ' with us right now.');
+    setOut('generated', 'Generated ' + longDate(new Date()));
+
+    const per = $('.period', sheetEl);
+    if (per) { const t = periodText(S.from, S.to); per.textContent = t || 'Pick dates'; per.classList.toggle('is-blank', !t); }
+
+    allCols().forEach(c => {
+      const el = $(`.col[data-col="${c.id}"]`, sheetEl);
+      if (!el) return;
+      $('.col-count', el).textContent = named(c.kids);
+      $('.empty', el).hidden = c.kids.length > 0;
+    });
+
+    const rl = $('.rep-line', sheetEl);
+    if (rl) rl.classList.toggle('both', !!(S.rep.email.trim() && S.rep.phone.trim()));
+
+    S.blocks.forEach(b => {
+      const el = $(`[data-blk="${b.id}"]`, sheetEl);
+      if (!el) return;
+      if (b.type === 'defs') renderDefs(b, el);
+      if (b.type === 'note') el.classList.toggle('is-empty', !b.text.trim());
+    });
+
+    syncSidebar();
+    updateLibrary();
+    checkFit();
+    updateChrome();
+  }
+
+  function checkFit() {
+    const mark = $('.pagemark', sheetEl);
+    if (!mark) return false;
+    const over = sheetEl.offsetHeight > mark.offsetHeight + 2;
+    sheetEl.classList.toggle('over', over);
+    const pill = $('#fitPill');
+    if (over) { pill.className = 'pill bad'; pill.innerHTML = I.alert + '<span>Too long for one page</span>'; }
+    else { pill.className = 'pill ok'; pill.innerHTML = I.check + '<span>Fits on one page</span>'; }
+    $('#fitFix').hidden = !over || !!S.compact;
+    return over;
+  }
+
+  function updateChrome() {
+    $('#btnUndo').disabled = !undoStack.length && !(editSnap !== null && editSnap !== snapshot());
+    $('#btnRedo').disabled = !redoStack.length;
+    $('#sampleBar').hidden = !S.sample;
+  }
+
+  /* ---------------- side panel ---------------- */
+  function setVal(id, v) { const el = document.getElementById(id); if (el && document.activeElement !== el && el.value !== v) el.value = v; }
+  function syncSidebar() {
+    setVal('f-doctor', S.doctor);
+    setVal('f-from', S.from);
+    setVal('f-to', S.to);
+    ['name', 'title', 'email', 'phone'].forEach(k => setVal('f-rep-' + k, S.rep[k]));
+    $('#o-compact').checked = !!S.compact;
+    const defs = S.blocks.find(b => b.type === 'defs');
+    const o = $('#o-used');
+    o.checked = !!defs && defs.mode === 'used';
+    o.disabled = !defs;
+    o.closest('.opt').classList.toggle('is-off', !defs);
+  }
+  function syncSheetText(sel, v) { const el = $(sel, sheetEl); if (el && document.activeElement !== el && el.textContent !== v) el.textContent = v; }
+
+  function updateLibrary() {
+    const cols = allCols();
+    const full = cols.length >= MAX_COLS;
+    $$('.side [data-add]').forEach(t => {
+      const k = t.dataset.add;
+      let state = 'add';
+      if (k.indexOf('col-') === 0) {
+        const p = k.slice(4);
+        if (p !== 'custom' && cols.some(c => c.preset === p)) state = 'on';
+        else if (full) state = 'full';
+      } else if (k === 'defs' && S.blocks.some(b => b.type === 'defs')) state = 'on';
+      t.classList.toggle('is-on', state !== 'add');
+      t.classList.toggle('is-full', state === 'full');
+      t.setAttribute('aria-disabled', state !== 'add' ? 'true' : 'false');
+      const label = state === 'on' ? I.check + 'On the page' : state === 'full' ? 'Page is full' : I.plus + 'Add';
+      const st = $('.st', t);
+      if (st._html !== label) { st.innerHTML = label; st._html = label; }
+    });
+  }
+
+  /* ---------------- actions ---------------- */
+  function focusEl(sel, selectAll) {
+    const el = $(sel, sheetEl);
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    try {
+      const r = document.createRange();
+      r.selectNodeContents(el);
+      if (!selectAll) r.collapse(false);
+      const s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    } catch (e) { /* caret placement is best effort */ }
+    el.scrollIntoView({ block: 'nearest' });
+  }
+  function flash(sel) {
+    const el = $(sel, sheetEl);
+    if (!el) return;
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+    el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+  function focusInput(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    el.focus({ preventScroll: true });
+  }
+
+  function addKid(colId, afterId) {
+    const k = { id: uid(), name: '', status: '', custom: false };
+    commit(() => {
+      const c = findCol(colId);
+      const i = afterId ? c.kids.findIndex(x => x.id === afterId) + 1 : c.kids.length;
+      c.kids.splice(i, 0, k);
+    });
+    focusEl(`.row[data-kid="${k.id}"] .name`);
+  }
+
+  function removeKid(id, quiet) {
+    const f = findKid(id);
+    if (!f) return;
+    const nm = f.kid.name.trim();
+    commit(() => { f.col.kids.splice(f.index, 1); });
+    if (nm && !quiet) toast('Removed ' + nm + '.', true);
+  }
+
+  // Keeps a status only when it belongs in the new column.
+  function fixStatus(kid, from, to) {
+    if (from === to) return;
+    if (!showsStatus(to)) { kid.status = ''; kid.custom = false; return; }
+    const opts = statusOptions(to);
+    if (!opts.length) { kid.custom = true; return; }
+    const m = opts.find(o => o.toLowerCase() === kid.status.trim().toLowerCase());
+    kid.status = m || '';
+    kid.custom = false;
+  }
+
+  function moveKid(id, toColId, index) {
+    const changed = commit(() => {
+      const f = findKid(id);
+      const to = findCol(toColId);
+      if (!f || !to) return;
+      f.col.kids.splice(f.index, 1);
+      to.kids.splice(Math.min(index, to.kids.length), 0, f.kid);
+      fixStatus(f.kid, f.col, to);
+    });
+    if (!changed) render();
+  }
+
+  function chooseStatus(kidId, colId, status) {
+    let movedTo = null;
+    commit(() => {
+      const f = findKid(kidId);
+      const to = findCol(colId);
+      if (!f || !to) return;
+      if (f.col !== to) {
+        f.col.kids.splice(f.index, 1);
+        to.kids.push(f.kid);
+        fixStatus(f.kid, f.col, to);
+        movedTo = to;
+      }
+      if (status !== null) { f.kid.status = status; f.kid.custom = false; }
+    });
+    if (movedTo) { flash(`.row[data-kid="${kidId}"]`); toast('Moved to ' + colLabel(movedTo) + '.', true); }
+  }
+
+  function typeOwn(kidId) {
+    commit(() => { const f = findKid(kidId); if (f) f.kid.custom = true; });
+    focusEl(`.row[data-kid="${kidId}"] .st-text`, true);
+  }
+
+  function removeCol(id) {
+    const c = findCol(id);
+    if (!c) return;
+    const n = named(c.kids);
+    commit(() => { const b = colsBlock(); b.cols = b.cols.filter(x => x.id !== id); });
+    toast('Removed ' + colLabel(c) + (n ? ' and its ' + plural(n, 'child', 'children') : '') + '.', true);
+  }
+
+  function cycleColor(id) {
+    commit(() => {
+      const c = findCol(id);
+      c.color = COLOR_ORDER[(COLOR_ORDER.indexOf(c.color) + 1) % COLOR_ORDER.length];
+    });
+  }
+
+  function removeBlock(id) {
+    const b = findBlock(id);
+    if (!b) return;
+    commit(() => { S.blocks = S.blocks.filter(x => x.id !== id); });
+    toast(b.type === 'defs' ? 'Removed the status meanings.' : 'Removed the note.', true);
+  }
+
+  function setCompact(v) { commit(() => { S.compact = v; }); }
+
+  function addFromLibrary(kind, index) {
+    if (kind.indexOf('col-') === 0) {
+      const preset = kind.slice(4);
+      const cb = colsBlock();
+      if (preset !== 'custom' && cb.cols.some(c => c.preset === preset)) { render(); return; }
+      if (cb.cols.length >= MAX_COLS) { render(); toast('The page fits up to four columns. Remove one first.'); return; }
+      const c = makeCol(preset, cb.cols.map(x => x.color));
+      commit(() => {
+        let i = index;
+        if (i == null) {
+          if (preset === 'custom') i = cb.cols.length;
+          else {
+            const rank = PRESET_ORDER.indexOf(preset);
+            i = cb.cols.findIndex(x => x.preset === 'custom' || PRESET_ORDER.indexOf(x.preset) > rank);
+            if (i < 0) i = cb.cols.length;
+          }
+        }
+        cb.cols.splice(i, 0, c);
+      });
+      flash(`.col[data-col="${c.id}"]`);
+      if (preset === 'custom') focusEl(`.col[data-col="${c.id}"] .col-title`);
+      else toast('Added ' + c.title + '.', true);
+      return;
+    }
+    if (kind === 'defs') {
+      if (S.blocks.some(b => b.type === 'defs')) { render(); return; }
+      const d = makeDefs();
+      commit(() => {
+        let i = index;
+        if (i == null) { i = S.blocks.findIndex(b => b.type === 'cols') + 1; }
+        S.blocks.splice(i, 0, d);
+      });
+      flash(`[data-blk="${d.id}"]`);
+      toast('Added the status meanings.', true);
+      return;
+    }
+    if (kind === 'note') {
+      const n = makeNote();
+      commit(() => { S.blocks.splice(index == null ? S.blocks.length : index, 0, n); });
+      flash(`[data-blk="${n.id}"]`);
+      focusEl(`[data-blk="${n.id}"] .note-text`);
+    }
+  }
+
+  function bulkAdd(nameEl, text) {
+    const f = findKid(nameEl.closest('.row').dataset.kid);
+    if (!f) return;
+    const lines = text.split(/\r?\n/).map(l => l.split('\t').map(x => x.trim())).filter(cells => cells[0]);
+    if (!lines.length) return;
+    const opts = statusOptions(f.col);
+    const made = lines.map(cells => {
+      const k = { id: uid(), name: cells[0], status: '', custom: false };
+      const st = cells[1] || '';
+      if (showsStatus(f.col) && st) {
+        const m = opts.find(o => o.toLowerCase() === st.toLowerCase());
+        if (m) k.status = m; else { k.status = st; k.custom = true; }
+      }
+      return k;
+    });
+    const kidId = f.kid.id, colId = f.col.id;
+    commit(() => {
+      const c = findCol(colId);
+      const i = c.kids.findIndex(k => k.id === kidId);
+      if (!c.kids[i].name.trim()) c.kids.splice(i, 1, ...made);
+      else c.kids.splice(i + 1, 0, ...made);
+    });
+    toast('Added ' + plural(made.length, 'child', 'children') + '.', true);
+    focusEl(`.row[data-kid="${made[made.length - 1].id}"] .name`);
+  }
+
+  /* ---------------- sheet events ---------------- */
+  function isEditable(el) {
+    return !!el && (el.isContentEditable || (el.matches && el.matches('.side input[type=text], .side input[type=date], .side input[type=email], .side input[type=tel]')));
+  }
+  function readText(el) {
+    if (el.dataset.blkf === 'text') return el.innerText.replace(/ /g, ' ').replace(/\n$/, '');
+    return el.textContent.replace(/ /g, ' ').replace(/[\r\n]+/g, ' ');
+  }
+
+  sheetEl.addEventListener('input', e => {
+    const el = e.target.closest('[contenteditable]');
+    if (!el) return;
+    if (el.textContent === '' && el.innerHTML !== '') el.innerHTML = '';
+    const v = readText(el);
+    if (el.dataset.f) {
+      S[el.dataset.f] = v;
+    } else if (el.dataset.rep) {
+      S.rep[el.dataset.rep] = v; saveRep();
+    } else if (el.dataset.colf) {
+      const c = findCol(el.closest('[data-col]').dataset.col); if (c) c[el.dataset.colf] = v;
+    } else if (el.dataset.kidf) {
+      const f = findKid(el.closest('[data-kid]').dataset.kid); if (f) f.kid[el.dataset.kidf] = v;
+    } else if (el.dataset.blkf) {
+      const b = findBlock(el.closest('[data-blk]').dataset.blk); if (b) b[el.dataset.blkf] = v;
+    }
+    touch();
+    updateDerived();
+  });
+
+  sheetEl.addEventListener('keydown', e => {
+    const el = e.target.closest('[contenteditable]');
+    if (!el) return;
+    const isName = el.dataset.kidf === 'name';
+    if (e.key === 'Enter' && !e.shiftKey && isName) {
+      e.preventDefault();
+      const row = el.closest('.row');
+      if (el.textContent.trim()) addKid(row.closest('[data-rows]').dataset.rows, row.dataset.kid);
+      return;
+    }
+    if (e.key === 'Enter' && el.dataset.blkf !== 'text') { e.preventDefault(); el.blur(); return; }
+    if (e.key === 'Backspace' && isName && el.textContent === '') {
+      e.preventDefault();
+      const row = el.closest('.row');
+      const prev = row.previousElementSibling && row.previousElementSibling.classList.contains('row') ? row.previousElementSibling.dataset.kid : null;
+      removeKid(row.dataset.kid, true);
+      if (prev) focusEl(`.row[data-kid="${prev}"] .name`);
+      return;
+    }
+    if (e.key === 'Escape') el.blur();
+  });
+
+  sheetEl.addEventListener('paste', e => {
+    const el = e.target.closest('[contenteditable]');
+    if (!el) return;
+    e.preventDefault();
+    const text = (e.clipboardData && e.clipboardData.getData('text/plain')) || '';
+    if (el.dataset.kidf === 'name' && /\r?\n/.test(text.trim())) { bulkAdd(el, text); return; }
+    const clean = el.dataset.blkf === 'text' ? text : text.replace(/\s*[\r\n]+\s*/g, ' ').replace(/\t/g, ' ');
+    document.execCommand('insertText', false, clean);
+  });
+
+  sheetEl.addEventListener('click', e => {
+    const b = e.target.closest('[data-act]');
+    if (!b) return;
+    const act = b.dataset.act;
+    const kidEl = b.closest('[data-kid]'), colEl = b.closest('[data-col]'), blkEl = b.closest('[data-blk]');
+    if (act === 'add-kid') addKid(colEl.dataset.col);
+    else if (act === 'rm-kid') removeKid(kidEl.dataset.kid);
+    else if (act === 'menu') openKidMenu(kidEl.dataset.kid, b);
+    else if (act === 'rm-col') removeCol(colEl.dataset.col);
+    else if (act === 'color') cycleColor(colEl.dataset.col);
+    else if (act === 'rm-blk') removeBlock(blkEl.dataset.blk);
+    else if (act === 'hide-def') { const d = b.closest('[data-def]').dataset.def; commit(() => { findBlock(blkEl.dataset.blk).hidden.push(d); }); }
+    else if (act === 'show-defs') commit(() => { findBlock(blkEl.dataset.blk).hidden = []; });
+    else if (act === 'dates') {
+      const inp = $('#f-from');
+      focusInput('f-from');
+      try { if (inp.showPicker) inp.showPicker(); } catch (err) { /* not every browser allows it */ }
+    }
+  });
+
+  document.addEventListener('focusin', e => { if (isEditable(e.target)) { editSnap = snapshot(); } });
+  document.addEventListener('focusout', e => { if (isEditable(e.target)) flushEdit(); });
+
+  /* ---------------- drag and drop ---------------- */
+  const DRAG = { animation: 160, ghostClass: 'is-ghost', chosenClass: 'is-chosen', dragClass: 'is-drag' };
+
+  // Where a card from the side panel landed. Sortable reports the index
+  // using the side panel's selector, so count the page's own items instead.
+  function dropIndex(item, sel) {
+    let i = 0, el = item;
+    while ((el = el.previousElementSibling)) if (el.matches(sel)) i++;
+    return i;
+  }
+  function onLibraryDrop(sel) {
+    return e => { const kind = e.item.dataset.add; const i = dropIndex(e.item, sel); e.item.remove(); later(() => addFromLibrary(kind, i)); };
+  }
+
+  function initSheetSortables() {
+    if (!window.Sortable) return;
+    const blocksEl = $('#blocks', sheetEl);
+    sortables.push(Sortable.create(blocksEl, Object.assign({}, DRAG, {
+      group: { name: 'blocks', pull: false, put: true },
+      handle: '.blk-grip', draggable: '.blk',
+      onAdd: onLibraryDrop('.blk'),
+      onEnd: e => {
+        if (e.from !== e.to || e.oldDraggableIndex === e.newDraggableIndex) return;
+        const a = e.oldDraggableIndex, z = e.newDraggableIndex;
+        later(() => { if (!commit(() => { const m = S.blocks.splice(a, 1)[0]; S.blocks.splice(z, 0, m); })) render(); });
+      }
+    })));
+    $$('.cols', sheetEl).forEach(el => {
+      sortables.push(Sortable.create(el, Object.assign({}, DRAG, {
+        group: { name: 'cols', pull: false, put: true },
+        handle: '.col-grip', draggable: '.col', direction: 'horizontal',
+        onAdd: onLibraryDrop('.col'),
+        onEnd: e => {
+          if (e.from !== e.to || e.oldDraggableIndex === e.newDraggableIndex) return;
+          const a = e.oldDraggableIndex, z = e.newDraggableIndex;
+          later(() => { if (!commit(() => { const cols = colsBlock().cols; const m = cols.splice(a, 1)[0]; cols.splice(z, 0, m); })) render(); });
+        }
+      })));
+    });
+    $$('.rows', sheetEl).forEach(el => {
+      sortables.push(Sortable.create(el, Object.assign({}, DRAG, {
+        group: 'kids', handle: '.row-grip', draggable: '.row',
+        onEnd: e => {
+          if (e.from === e.to && e.oldDraggableIndex === e.newDraggableIndex) return;
+          const id = e.item.dataset.kid, to = e.to.dataset.rows, i = e.newDraggableIndex;
+          later(() => moveKid(id, to, i));
+        }
+      })));
+    });
+  }
+
+  function initLibrarySortables() {
+    if (!window.Sortable) return;
+    [['libCols', 'cols'], ['libSecs', 'blocks']].forEach(pair => {
+      Sortable.create(document.getElementById(pair[0]), Object.assign({}, DRAG, {
+        group: { name: pair[1], pull: 'clone', put: false },
+        sort: false, draggable: '.tile', filter: '.is-on', preventOnFilter: false
+      }));
+    });
+  }
+
+  /* ---------------- status menu ---------------- */
+  const menu = $('#menu');
+  let menuAnchor = null;
+
+  function mItem(colId, status, label, current) {
+    return `<button type="button" class="menu-item${current ? ' is-current' : ''}" role="menuitemradio" aria-checked="${current}" data-m="pick" data-col="${colId}" ${status === null ? 'data-keep="1"' : `data-status="${esc(status)}"`}><span class="ck">${current ? I.check : ''}</span><span>${esc(label)}</span></button>`;
+  }
+
+  function openKidMenu(kidId, anchor) {
+    const f = findKid(kidId);
+    if (!f) return;
+    let h = `<div class="menu-head">${f.kid.name.trim() ? esc(f.kid.name) : 'This child'}</div>`;
+    allCols().forEach(c => {
+      const here = c.id === f.col.id;
+      h += `<div class="menu-sec" role="presentation"><span class="swatch" style="background:${pal(c).accent}"></span>${esc(colLabel(c))}</div>`;
+      if (!showsStatus(c)) h += mItem(c.id, '', c.preset === 'care' ? 'Therapy has started' : 'Move here', here);
+      else {
+        const opts = statusOptions(c);
+        if (!opts.length) h += mItem(c.id, null, here ? 'Already in this column' : 'Move here', here);
+        else opts.forEach(o => { h += mItem(c.id, o, o, here && !f.kid.custom && f.kid.status === o); });
+      }
+    });
+    h += '<div class="menu-sep" role="separator"></div>';
+    if (showsStatus(f.col) && statusOptions(f.col).length) h += `<button type="button" class="menu-item" role="menuitem" data-m="own"><span class="ck">${I.pencil}</span><span>Type my own status</span></button>`;
+    h += `<button type="button" class="menu-item danger" role="menuitem" data-m="rm"><span class="ck">${I.x}</span><span>Remove this child</span></button>`;
+    menu.innerHTML = h;
+    menu.dataset.kid = kidId;
+    menu.hidden = false;
+    menuAnchor = anchor;
+    const r = anchor.getBoundingClientRect();
+    const mw = menu.offsetWidth, mh = menu.offsetHeight;
+    let left = Math.max(12, Math.min(r.left, window.innerWidth - mw - 12));
+    let top = r.bottom + 6;
+    if (top + mh > window.innerHeight - 12) top = Math.max(12, r.top - mh - 6);
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+    const first = $('.menu-item.is-current', menu) || $('.menu-item', menu);
+    if (first) first.focus({ preventScroll: true });
+  }
+  function closeMenu(refocus) {
+    if (menu.hidden) return;
+    menu.hidden = true;
+    if (refocus && menuAnchor && document.contains(menuAnchor)) menuAnchor.focus({ preventScroll: true });
+    menuAnchor = null;
+  }
+  menu.addEventListener('click', e => {
+    const b = e.target.closest('.menu-item');
+    if (!b) return;
+    const kidId = menu.dataset.kid;
+    closeMenu(false);
+    if (b.dataset.m === 'pick') chooseStatus(kidId, b.dataset.col, b.dataset.keep ? null : b.dataset.status);
+    else if (b.dataset.m === 'own') typeOwn(kidId);
+    else if (b.dataset.m === 'rm') removeKid(kidId);
+  });
+  menu.addEventListener('keydown', e => {
+    const items = $$('.menu-item', menu);
+    const i = items.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') { e.preventDefault(); items[(i + 1) % items.length].focus(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
+    else if (e.key === 'Escape') { e.preventDefault(); closeMenu(true); }
+    else if (e.key === 'Tab') closeMenu(false);
+  });
+
+  /* ---------------- toast ---------------- */
+  const toastEl = $('#toast');
+  let toastTimer = null;
+  function toast(msg, withUndo) {
+    $('#toastMsg').textContent = msg;
+    $('#toastUndo').hidden = !withUndo;
+    toastEl.classList.toggle('no-undo', !withUndo);
+    toastEl.hidden = false;
+    toastEl.classList.remove('show'); void toastEl.offsetWidth; toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { toastEl.hidden = true; }, withUndo ? 7000 : 3800);
+  }
+  $('#toastUndo').addEventListener('click', () => { toastEl.hidden = true; undo(); });
+
+  /* ---------------- my sheets ---------------- */
+  const panel = $('#sheetsPanel');
+  function openPanel() { renderPanel(); panel.hidden = false; $('#btnSheets').setAttribute('aria-expanded', 'true'); }
+  function closePanel() { panel.hidden = true; $('#btnSheets').setAttribute('aria-expanded', 'false'); }
+  function renderPanel() {
+    saveNow();
+    const db = readDB();
+    const list = Object.values(db.sheets).sort((a, b) => (b.updated || 0) - (a.updated || 0));
+    $('#shList').innerHTML = list.map(s => {
+      const cur = s.id === S.id;
+      const n = named(allKids(s));
+      return `<li class="sh-item${cur ? ' is-current' : ''}" data-id="${s.id}">
+        <div class="sh-main"><div class="sh-name">${esc(s.doctor.trim() || 'Untitled sheet')}</div><div class="sh-meta">${plural(n, 'child', 'children')} &middot; edited ${relDate(s.updated)}</div></div>
+        <div class="sh-acts">${cur ? '<span class="sh-badge">Open now</span>' : '<button type="button" class="sbtn solid" data-sh="open">Open</button>'}<button type="button" class="sbtn" data-sh="copy" title="Make a copy with today's date">Copy</button><button type="button" class="sbtn danger" data-sh="del">Delete</button></div>
+      </li>`;
+    }).join('') || '<li class="sh-empty">No saved sheets yet. A sheet saves on its own once it has a doctor or a child on it.</li>';
+    $('#shDelAllWrap').innerHTML = list.length ? '<button type="button" class="sbtn quiet" id="shDelAll">Delete all</button>' : '';
+  }
+  function switchTo(s, msg) {
+    flushEdit(); saveNow();
+    S = s; resetHistory(); render(); saveNow();
+    if (msg) toast(msg);
+  }
+  panel.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    if (b.id === 'shNew') { closePanel(); newSheet(); return; }
+    if (b.id === 'shDelAll') {
+      $('#shDelAllWrap').innerHTML = '<span class="sh-q">Delete every saved sheet?</span> <button type="button" class="sbtn danger solid" id="shDelAllYes">Delete all</button> <button type="button" class="sbtn" id="shDelAllNo">Keep</button>';
+      return;
+    }
+    if (b.id === 'shDelAllNo') { renderPanel(); return; }
+    if (b.id === 'shDelAllYes') {
+      store.set(K_SHEETS, { current: null, sheets: {} });
+      S = blankSheet(); resetHistory(); render();
+      renderPanel(); toast('Deleted all saved sheets.');
+      return;
+    }
+    const li = b.closest('[data-id]');
+    if (!li) return;
+    const id = li.dataset.id;
+    const db = readDB();
+    const src = db.sheets[id];
+    if (b.dataset.sh === 'open' && src) { closePanel(); switchTo(migrate(JSON.parse(JSON.stringify(src))), 'Opened ' + (src.doctor.trim() || 'the sheet') + '.'); }
+    else if (b.dataset.sh === 'copy' && src) {
+      const c = migrate(JSON.parse(JSON.stringify(src)));
+      c.id = uid(); c.updated = Date.now(); c.sample = false;
+      c.from = isoDate(monthsAgo(6)); c.to = isoDate(new Date());
+      closePanel();
+      switchTo(c, 'Made a copy of ' + (src.doctor.trim() || 'the sheet') + ' with new dates. Update the children, then print.');
+    } else if (b.dataset.sh === 'del') {
+      $('.sh-acts', li).innerHTML = '<span class="sh-q">Delete this sheet?</span><button type="button" class="sbtn danger solid" data-sh="del-yes">Delete</button><button type="button" class="sbtn" data-sh="del-no">Keep</button>';
+    } else if (b.dataset.sh === 'del-no') renderPanel();
+    else if (b.dataset.sh === 'del-yes') {
+      delete db.sheets[id];
+      store.set(K_SHEETS, db);
+      if (id === S.id) { S = blankSheet(); resetHistory(); render(); }
+      renderPanel();
+      toast('Deleted the sheet.');
+    }
+  });
+
+  function newSheet() {
+    flushEdit();
+    const had = !S.sample && hasContent(S);
+    saveNow();
+    S = blankSheet(); resetHistory(); render(); saveNow();
+    toast(had ? 'Started a new sheet. Your last one is saved in My sheets.' : 'Started a new sheet.');
+    focusInput('f-doctor');
+  }
+  function loadExample() {
+    flushEdit(); saveNow();
+    S = sampleSheet(); resetHistory(); render();
+    toast('Loaded an example with made-up names.');
+  }
+
+  /* ---------------- printing ---------------- */
+  let issues = [];
+  function printIssues() {
+    const out = [];
+    if (S.sample) out.push({ text: 'This is the example sheet. The names are made up.', act: 'Start my own', fn: newSheet });
+    if (!S.doctor.trim()) out.push({ text: "The doctor's name is blank.", act: 'Add it', fn: () => focusInput('f-doctor') });
+    if (!named(allKids())) out.push({ text: 'There are no children on the sheet yet.' });
+    allCols().forEach(c => {
+      if (!named(c.kids)) out.push({ text: colLabel(c) + ' has no children in it.', act: 'Remove column', fn: () => removeCol(c.id), stay: true });
+    });
+    let missing = 0;
+    allCols().forEach(c => { if (showsStatus(c) && statusOptions(c).length) missing += c.kids.filter(k => k.name.trim() && !k.status.trim()).length; });
+    if (missing) out.push({ text: plural(missing, 'child has', 'children have') + ' no status yet.' });
+    const note = S.blocks.find(b => b.type === 'note' && !b.text.trim());
+    if (note) out.push({ text: 'The note to the doctor is empty.', act: 'Remove note', fn: () => removeBlock(note.id), stay: true });
+    if (!S.rep.name.trim()) out.push({ text: 'Your name is blank in the footer.', act: 'Add it', fn: () => focusInput('f-rep-name') });
+    if (checkFit()) out.push(S.compact
+      ? { text: 'The page is too long. Rows past the red line will be cut off. Remove a section or some names.' }
+      : { text: 'The page is too long. Rows past the red line will be cut off.', act: 'Fit more names', fn: () => setCompact(true), stay: true });
+    return out;
+  }
+  function renderModal() {
+    issues = printIssues();
+    if (!issues.length) {
+      $('#modalTitle').innerHTML = 'Ready to <em>print.</em>';
+      $('#modalIntro').textContent = 'Everything on the sheet looks good.';
+      $('#issues').innerHTML = '';
+      $('#btnPrintGo').textContent = 'Print / Save PDF';
+    } else {
+      $('#modalTitle').innerHTML = 'Before you <em>print</em>';
+      $('#modalIntro').textContent = 'A few things to check. Fix them here, or print as is.';
+      $('#issues').innerHTML = issues.map((x, i) => `<li class="issue"><span class="ic">${I.alert}</span><span class="tx">${esc(x.text)}</span>${x.act ? `<button type="button" class="sbtn" data-issue="${i}">${esc(x.act)}</button>` : ''}</li>`).join('');
+      $('#btnPrintGo').textContent = 'Print anyway';
+    }
+  }
+  function openModal() { renderModal(); $('#modal').hidden = false; $('#btnPrintGo').focus(); }
+  function closeModal() { $('#modal').hidden = true; }
+  $('#issues').addEventListener('click', e => {
+    const b = e.target.closest('[data-issue]');
+    if (!b) return;
+    const x = issues[+b.dataset.issue];
+    if (x.stay) { x.fn(); renderModal(); }
+    else { closeModal(); x.fn(); }
+  });
+  $('#btnBack').addEventListener('click', closeModal);
+  $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+  $('#btnPrintGo').addEventListener('click', () => { closeModal(); reallyPrint(); });
+
+  function printTitle() { return 'Referral Update - ' + (S.doctor.trim() || 'Doctor') + ' - ' + isoDate(new Date()); }
+  function reallyPrint() {
+    closeMenu(false); closePanel(); blurEditing();
+    document.title = printTitle();
+    window.print();
+  }
+  function doPrint() {
+    flushEdit(); blurEditing(); closeMenu(false); closePanel();
+    if (printIssues().length) openModal(); else reallyPrint();
+  }
+  window.addEventListener('beforeprint', () => { document.title = printTitle(); closeMenu(false); });
+  window.addEventListener('afterprint', () => { document.title = BASE_TITLE; });
+
+  /* ---------------- side panel events ---------------- */
+  const side = $('#side');
+  side.addEventListener('input', e => {
+    const t = e.target;
+    if (t.id === 'f-doctor') { S.doctor = t.value; syncSheetText('[data-f="doctor"]', t.value); }
+    else if (t.id === 'f-from') S.from = t.value;
+    else if (t.id === 'f-to') S.to = t.value;
+    else if (t.id.indexOf('f-rep-') === 0) { const k = t.id.slice(6); S.rep[k] = t.value; syncSheetText(`[data-rep="${k}"]`, t.value); saveRep(); }
+    else return;
+    touch();
+    updateDerived();
+  });
+  side.addEventListener('change', e => {
+    if (e.target.id === 'o-compact') setCompact(e.target.checked);
+    if (e.target.id === 'o-used') commit(() => { const d = S.blocks.find(b => b.type === 'defs'); if (d) d.mode = e.target.checked ? 'used' : 'all'; });
+  });
+  function tileActivate(t) { if (t && !t.classList.contains('is-on')) addFromLibrary(t.dataset.add); }
+  side.addEventListener('click', e => { const t = e.target.closest('[data-add]'); if (t) tileActivate(t); });
+  side.addEventListener('keydown', e => {
+    const t = e.target.closest('[data-add]');
+    if (t && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); tileActivate(t); }
+  });
+
+  const tips = $('#tips');
+  function setTips(hidden) { tips.hidden = hidden; $('#showTipsWrap').hidden = !hidden; store.set(K_TIPS, hidden); }
+  $('#btnHideTips').addEventListener('click', () => setTips(true));
+  $('#btnShowTips').addEventListener('click', () => { setTips(false); tips.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
+  $('#btnExample').addEventListener('click', loadExample);
+  $('#btnStartOwn').addEventListener('click', newSheet);
+  $('#fitFix').addEventListener('click', () => setCompact(true));
+
+  /* ---------------- top bar ---------------- */
+  $('#btnUndo').addEventListener('click', undo);
+  $('#btnRedo').addEventListener('click', redo);
+  $('#btnNew').addEventListener('click', newSheet);
+  $('#btnPrint').addEventListener('click', doPrint);
+  $('#btnSheets').addEventListener('click', () => { panel.hidden ? openPanel() : closePanel(); });
+
+  /* ---------------- global keys and clicks ---------------- */
+  function isTextTarget(el) { return !!el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName)); }
+  document.addEventListener('keydown', e => {
+    const mod = e.metaKey || e.ctrlKey;
+    const k = (e.key || '').toLowerCase();
+    if (mod && k === 'p') { e.preventDefault(); doPrint(); return; }
+    if (mod && k === 'z' && !isTextTarget(e.target)) { e.preventDefault(); if (e.shiftKey) redo(); else undo(); return; }
+    if (mod && k === 'y' && !isTextTarget(e.target)) { e.preventDefault(); redo(); return; }
+    if (e.key === 'Escape') {
+      if (!$('#modal').hidden) closeModal();
+      else if (!panel.hidden) closePanel();
+    }
+  });
+  document.addEventListener('pointerdown', e => {
+    if (!menu.hidden && !menu.contains(e.target) && !(menuAnchor && menuAnchor.contains(e.target))) closeMenu(false);
+    if (!panel.hidden && !panel.contains(e.target) && !e.target.closest('#btnSheets')) closePanel();
+  });
+  window.addEventListener('scroll', () => closeMenu(false), true);
+
+  /* ---------------- fit the sheet to the screen ---------------- */
+  function fitZoom() {
+    const desk = $('#desk');
+    const cs = getComputedStyle(desk);
+    const avail = desk.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const z = Math.max(0.3, Math.min(1, avail / 816));
+    desk.style.setProperty('--z', z);
+    $('#stage').style.zoom = z;
+  }
+  window.addEventListener('resize', () => { fitZoom(); checkFit(); });
+  window.addEventListener('beforeunload', () => { flushEdit(); saveNow(); });
+
+  /* ---------------- start ---------------- */
+  S = loadInitial();
+  if (location.hash === '#example') S = sampleSheet();
+  if (store.get(K_TIPS, false)) { tips.hidden = true; $('#showTipsWrap').hidden = false; }
+  fitZoom();
+  render();
+  initLibrarySortables();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => updateDerived());
+})();
+</script>
+</body>
+</html>
