@@ -446,6 +446,9 @@ button { font-family: inherit; }
 .ch-h:first-child { margin-top: 12px; }
 #choices .choices { margin: 0; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
 .one-row { display: flex; gap: 8px; }
+.one-row .sbtn { height: 40px; padding: 0 18px; }
+.blank-row { margin: 18px 0 0; padding-top: 14px; border-top: 1px solid var(--panel-line); font-size: 13px; color: var(--body-soft); }
+.blank-row .link-btn { color: var(--app-magenta); font-size: 13px; }
 .one-row select { flex: 1; min-width: 0; height: 40px; padding: 0 10px; border: 1px solid var(--field-line); border-radius: 10px; background: var(--field); font: 400 14px var(--app-sans); color: #333333; }
 #choices + .dialog-btns { margin-top: 16px; }
 
@@ -869,7 +872,7 @@ button { font-family: inherit; }
   };
 
   const PRESETS = STATE_ORDER.map(ab => ({ key: ab.toLowerCase(), group: 'state', label: STATES[ab].name, meta: centerCountLabel(ab), make: () => stateSheet(ab) })).concat([
-    { key: 'mc', group: 'home', label: 'Montgomery County, MD', meta: 'In-home, Rockville clinic coming soon', make: () => homeSheet({
+    { key: 'mc', group: 'home', label: 'Montgomery County, MD', meta: 'in-home, Rockville clinic coming soon', make: () => homeSheet({
       label: 'Montgomery County, MD', eyebrow: 'ABA program summary · Maryland', title: 'Montgomery County ABA Services', gold: 'ABA', pink: 'Services',
       sub: 'BCBA-led in-home ABA therapy for children and teens with autism, ages 18 months to 18 years, across Montgomery County. Clinic in Rockville coming soon.',
       bold: 'in-home ABA therapy, ages 18 months to 18 years, Clinic in Rockville coming soon.',
@@ -885,7 +888,7 @@ button { font-family: inherit; }
         plans: plans(['Maryland Medicaid', 'Major private insurers'], 1),
         insNote: "We verify each child's benefits before therapy starts. Coverage depends on the plan." }
     }) },
-    { key: 'nova', group: 'home', label: 'Northern Virginia', meta: 'In-home, clinic coming soon', make: () => homeSheet({
+    { key: 'nova', group: 'home', label: 'Northern Virginia', meta: 'in-home, clinic coming soon', make: () => homeSheet({
       label: 'Northern Virginia', compact: true, eyebrow: 'ABA program summary · Virginia', title: 'Northern Virginia ABA Services', gold: 'Northern Virginia', pink: '',
       sub: 'BCBA-led in-home ABA therapy for children and teens with autism, ages 18 months to 18 years, across Prince William, Loudoun, Fairfax, Arlington, and Alexandria. A Northern Virginia clinic is coming soon.',
       areaTitle: 'Serving Northern Virginia',
@@ -1604,15 +1607,16 @@ button { font-family: inherit; }
 
   /* ---------------- starting a sheet ---------------- */
   const chooser = $('#chooser');
-  const choiceBtn = p => `<button type="button" class="choice${p.blank ? ' blank' : ''}" data-preset="${p.key}"><span class="c1">${esc(p.label)}</span><span class="c2">${esc(p.meta)}</span></button>`;
+  // Each kind of sheet is one dropdown and a Start button.
+  const pickRow = (id, label, options) => `<div class="one-row"><select id="${id}" aria-label="${label}">${options}</select><button type="button" class="sbtn solid" data-preset-from="${id}">Start</button></div>`;
+  const opt = p => `<option value="${p.key}">${esc(p.label)} (${esc(p.meta)})</option>`;
   $('#choices').innerHTML =
-    '<p class="ch-h">A whole state</p><div class="choices">' + PRESETS.filter(p => p.group === 'state').map(choiceBtn).join('') + '</div>' +
-    '<p class="ch-h">In-home areas</p><div class="choices">' + PRESETS.filter(p => p.group === 'home').map(choiceBtn).join('') + '</div>' +
-    '<p class="ch-h">One center</p><div class="one-row"><select id="oneCenter" aria-label="Pick a center">' +
-      STATE_ORDER.map(ab => `<optgroup label="${STATES[ab].name}">` + DIR.filter(c => c.st === ab).map(c => `<option value="center-${c.key}">${esc(c.name)}${c.soon ? ' (opening soon)' : ''}</option>`).join('') + '</optgroup>').join('') +
-    '</select><button type="button" class="sbtn solid" data-preset-from="oneCenter">Start</button></div>' +
-    '<p class="ch-h">Or start empty</p><div class="choices">' + PRESETS.filter(p => p.group === 'blank').map(choiceBtn).join('') + '</div>';
-  function openChooser() { closePanel(); chooser.hidden = false; $('#chooserCancel').hidden = !S; $('.choice', chooser).focus(); }
+    '<p class="ch-h">A whole state</p>' + pickRow('pickState', 'Pick a state', PRESETS.filter(p => p.group === 'state').map(opt).join('')) +
+    '<p class="ch-h">An in-home area</p>' + pickRow('pickHome', 'Pick an in-home area', PRESETS.filter(p => p.group === 'home').map(opt).join('')) +
+    '<p class="ch-h">One center</p>' + pickRow('oneCenter', 'Pick a center',
+      STATE_ORDER.map(ab => `<optgroup label="${STATES[ab].name}">` + DIR.filter(c => c.st === ab).map(c => `<option value="center-${c.key}">${esc(c.name)}${c.soon ? ' (opening soon)' : ''}</option>`).join('') + '</optgroup>').join('')) +
+    '<p class="blank-row">Or <button type="button" class="link-btn" data-preset="blank">start a blank sheet</button> with nothing filled in.</p>';
+  function openChooser() { closePanel(); chooser.hidden = false; $('#chooserCancel').hidden = !S; $('#pickState').focus(); }
   function closeChooser() { chooser.hidden = true; }
   $('#choices').addEventListener('click', e => {
     const b = e.target.closest('[data-preset], [data-preset-from]');
