@@ -203,9 +203,9 @@ button { font-family: inherit; }
 }
 .logo { height: 44px; width: auto; display: block; }
 .eyebrow { margin: 11px 0 0; font-size: 8.4px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--lime); }
-.eyebrow:empty:not(:focus) { display: none; }
+.eyebrow:empty:not(.editing) { display: none; }
 .title { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: var(--ts, 33px); line-height: 1.05; margin: 10px 0 0; color: #FFFFFF; text-wrap: balance; }
-.eyebrow:not(:empty) + .title, .eyebrow:focus + .title { margin-top: 4px; }
+.eyebrow:not(:empty) + .title, .eyebrow.editing + .title { margin-top: 4px; }
 .title .g { color: var(--gold); }
 .title .p { color: var(--pink); }
 .sub { margin: 9px 0 0; font-size: 11.2px; line-height: 1.55; color: #F3E9F3; }
@@ -220,6 +220,7 @@ button { font-family: inherit; }
 .sheet .tag { border-radius: 20px; }
 .stats-wrap { position: relative; }
 .stats { background: rgba(255,255,255,.09); border-radius: 22px; padding: 12px 18px; display: flex; flex-direction: column; gap: 7px; }
+.stats:empty { display: none; }
 .st { display: flex; align-items: baseline; gap: 10px; position: relative; }
 .st .n { font-family: var(--serif); font-style: italic; font-size: 22px; line-height: 1; color: var(--gold); white-space: nowrap; }
 .stats.aligned .n { min-width: 1.05in; }
@@ -248,10 +249,7 @@ button { font-family: inherit; }
 .tag-add { appearance: none; border: 1px dashed rgba(122,62,122,.5); background: transparent; color: var(--plum); font: 700 7.4px var(--sheet-sans); letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border-radius: 20px; cursor: pointer; }
 .card-lines { margin: 0; font-size: 10px; line-height: 1.5; color: var(--ink-soft); }
 .card-note { margin: auto 0 0; padding-top: 6px; font-size: 9px; line-height: 1.4; font-weight: 600; color: var(--plum); }
-/* An empty note takes no height, so the screen matches print. Its hint
-   shows in the card's bottom padding and stays clickable there. */
-.card-note:empty:not(:focus) { height: 0; padding-top: 0; }
-.card-note:empty:not(:focus)::before { display: block; padding-top: 1px; }
+
 .card-tools { position: absolute; top: -9px; right: -7px; display: flex; gap: 3px; z-index: 4; opacity: 0; pointer-events: none; transition: opacity .12s; }
 .card:hover .card-tools, .card:focus-within .card-tools { opacity: 1; pointer-events: auto; }
 
@@ -365,6 +363,15 @@ button { font-family: inherit; }
 .sheet.compact .focus { padding: 9px 9px 8px; }
 .sheet.compact .foot { padding-block: 0.15in 0.12in; }
 
+/* The fit check measures the sheet the way it prints. Keep this list the same as the
+   hiding rules in the print stylesheet at the bottom. */
+.sheet.measuring .screen { display: none !important; }
+.sheet.measuring [data-ph]:empty::before { content: none !important; }
+.sheet.measuring .card-note:empty, .sheet.measuring .card-lines:empty, .sheet.measuring .f-small:empty,
+.sheet.measuring .qr-l:empty, .sheet.measuring .sub:empty, .sheet.measuring .tagw:has(.tag:empty),
+.sheet.measuring .c-row:has([data-path]:empty), .sheet.measuring .rep-row:has([data-path]:empty),
+.sheet.measuring .pill:has(span:empty), .sheet.measuring .st:has(.n:empty), .sheet.measuring .fine b:empty { display: none !important; }
+
 /* where the printed page ends */
 .pagemark { position: absolute; left: 0; right: 0; top: 0; height: 11in; pointer-events: none; z-index: 7; }
 .sheet.over .pagemark { border-bottom: 2px dashed var(--bad); }
@@ -464,6 +471,20 @@ button { font-family: inherit; }
   .choices { grid-template-columns: 1fr; }
 }
 .lbl-short { display: none; }
+/* Phones: a smaller logo and buttons so the top bar never overlaps itself. */
+@media (max-width: 520px) {
+  .top { gap: 6px; padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); }
+  .brand img { height: 26px; }
+  .tb { height: 34px; }
+  .tb.icon { width: 34px; }
+  .tb.primary { padding: 0 12px; }
+}
+@media (max-width: 420px) { #btnRedo { display: none; } }
+@media (max-width: 360px) {
+  .brand img { height: 22px; }
+  .tb.primary .lbl-short { display: none; }
+  .tb.primary { width: 38px; padding: 0; }
+}
 
 /* ================= print: only the sheet ================= */
 @media print {
@@ -477,12 +498,10 @@ button { font-family: inherit; }
   .pagemark { display: none; }
   .sheet [contenteditable], .sheet [contenteditable]:hover, .sheet [contenteditable]:focus, .qr { box-shadow: none !important; }
   .sheet [data-ph]:empty::before { content: none !important; }
-  .card-note:empty, .card-lines:empty, .f-small:empty, .qr-l:empty, .sub:empty { display: none; }
-  .tag:empty, .tagw:has(.tag:empty) { display: none; }
-  .c-row:has([data-path]:empty), .rep-row:has([data-path]:empty) { display: none; }
-  .pill:has(span:empty) { display: none; }
-  .st:has(.n:empty) { display: none; }
-  .fine b:empty { display: none; }
+  /* Empty spots never print. !important so layout rules (like the plan grid) cannot win. */
+  .card-note:empty, .card-lines:empty, .f-small:empty, .qr-l:empty, .sub:empty,
+  .tag:empty, .tagw:has(.tag:empty), .c-row:has([data-path]:empty), .rep-row:has([data-path]:empty),
+  .pill:has(span:empty), .st:has(.n:empty), .fine b:empty { display: none !important; }
   .flash { animation: none; }
 }
 </style>
@@ -509,7 +528,7 @@ button { font-family: inherit; }
     <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
     <span class="lbl">New sheet</span>
   </button>
-  <button type="button" class="tb primary" id="btnPrint">
+  <button type="button" class="tb primary" id="btnPrint" aria-label="Print / Save PDF" title="Print / Save PDF">
     <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 7.5V3h9v4.5M5.5 14H4a1.5 1.5 0 0 1-1.5-1.5v-4A1.5 1.5 0 0 1 4 7h12a1.5 1.5 0 0 1 1.5 1.5v4A1.5 1.5 0 0 1 16 14h-1.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M5.5 11.5h9V17h-9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
     <span class="lbl">Print / Save PDF</span><span class="lbl-short">Print</span>
   </button>
@@ -1051,8 +1070,14 @@ button { font-family: inherit; }
     if (!u) return '<span class="qr-empty">Add a link<br>in the panel</span>';
     if (!window.qrcode) return '<span class="qr-empty">QR code<br>unavailable</span>';
     if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
-    const q = window.qrcode(0, 'M');
-    q.addData(u); q.make();
+    let q;
+    try {
+      if (window.qrcode.stringToBytesFuncs) window.qrcode.stringToBytes = window.qrcode.stringToBytesFuncs['UTF-8'];
+      q = window.qrcode(0, 'M');
+      q.addData(u); q.make();
+    } catch (e) {
+      return '<span class="qr-empty">Link is too long<br>for a QR code</span>';
+    }
     const n = q.getModuleCount();
     let d = '';
     for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (q.isDark(r, c)) d += 'M' + c + ' ' + r + 'h1v1h-1z';
@@ -1252,7 +1277,9 @@ button { font-family: inherit; }
   function checkFit() {
     const mark = $('.pagemark', sheetEl);
     if (!mark) return false;
+    sheetEl.classList.add('measuring');
     const over = sheetEl.offsetHeight > mark.offsetHeight + 2;
+    sheetEl.classList.remove('measuring');
     sheetEl.classList.toggle('over', over);
     const pill = $('#fitPill');
     if (over) { pill.className = 'pill-s bad'; pill.innerHTML = I.alert + '<span>Too long for one page</span>'; }
@@ -1336,7 +1363,7 @@ button { font-family: inherit; }
     if (/plans$/.test(list)) return x.name.trim() || 'the plan';
     if (/\.steps$/.test(list)) return 'the step';
     if (list === 'stats') return 'the stat';
-    return x.t ? x.t.trim() : 'the item';
+    return (x.t || '').trim() || 'the item';
   }
   function removeItem(list, i, quiet) {
     const arr = getPath(list);
@@ -1458,8 +1485,16 @@ button { font-family: inherit; }
     else if (act === 'qr') focusInput('f-qr');
   });
 
-  document.addEventListener('focusin', e => { if (isEditable(e.target)) editSnap = snapshot(); });
-  document.addEventListener('focusout', e => { if (isEditable(e.target)) flushEdit(); });
+  document.addEventListener('focusin', e => {
+    if (!isEditable(e.target)) return;
+    editSnap = snapshot();
+    if (e.target.isContentEditable) e.target.classList.add('editing');
+  });
+  document.addEventListener('focusout', e => {
+    if (!isEditable(e.target)) return;
+    if (e.target.classList) e.target.classList.remove('editing');
+    flushEdit();
+  });
 
   /* ---------------- drag and drop ---------------- */
   const DRAG = { animation: 160, ghostClass: 'is-ghost' };
@@ -1694,6 +1729,9 @@ button { font-family: inherit; }
         if (c.name.trim() && c.tone === 'soon' && dated) out.push({ text: c.name + ' says "' + dated.split('\n')[0] + '". Check the date is still right.' });
       });
       if (b.type === 'contact' && !b.name.trim()) out.push({ text: 'The local contact has no name.', act: 'Remove band', fn: () => removeBlock(i), stay: true });
+      const items = b.type === 'cards' ? b.cards : b.type === 'steps' ? b.steps : (b.type === 'icons' || b.type === 'focus') ? b.items : null;
+      if (items && !items.length) out.push({ text: (b.title || 'A section') + ' is empty.', act: 'Remove section', fn: () => removeBlock(i), stay: true });
+      if (b.type === 'line' && !b.label.trim() && !b.text.trim()) out.push({ text: 'A fine print line is empty.', act: 'Remove line', fn: () => removeBlock(i), stay: true });
     });
     if (!S.foot.plans.some(p => p.name.trim())) out.push({ text: 'No insurance plans are listed.' });
     if (checkFit()) out.push(S.compact
@@ -1728,7 +1766,13 @@ button { font-family: inherit; }
   $('#btnPrintGo').addEventListener('click', () => { closeModal(); reallyPrint(); });
 
   function printTitle() { return 'Treetop One-Pager - ' + (S.label || 'Sheet') + ' - ' + isoDate(new Date()); }
-  function reallyPrint() { closeMenu(false); closePanel(); blurEditing(); document.title = printTitle(); window.print(); }
+  function reallyPrint() {
+    closeMenu(false); closePanel(); blurEditing();
+    document.title = printTitle();
+    window.print();
+    // Most browsers send afterprint; this covers the ones that do not.
+    setTimeout(() => { document.title = BASE_TITLE; }, 1500);
+  }
   function doPrint() { flushEdit(); blurEditing(); closeMenu(false); closePanel(); if (printIssues().length) openModal(); else reallyPrint(); }
   window.addEventListener('beforeprint', () => { document.title = printTitle(); closeMenu(false); });
   window.addEventListener('afterprint', () => { document.title = BASE_TITLE; });
@@ -1763,7 +1807,8 @@ button { font-family: inherit; }
     if (!menu.hidden && !menu.contains(e.target) && !(menuAnchor && menuAnchor.contains(e.target))) closeMenu(false);
     if (!panel.hidden && !panel.contains(e.target) && !e.target.closest('#btnSheets')) closePanel();
   });
-  window.addEventListener('scroll', () => closeMenu(false), true);
+  // Scrolling the page closes a menu, but scrolling inside the menu (the long center list) must not.
+  window.addEventListener('scroll', e => { if (e.target instanceof Node && menu.contains(e.target)) return; closeMenu(false); }, true);
 
   function fitZoom() {
     const desk = $('#desk');
@@ -1780,10 +1825,24 @@ button { font-family: inherit; }
   const db = readDB();
   const hashPreset = PRESETS.find(p => '#' + p.key === location.hash);
   const saved = db.current && db.sheets[db.current];
-  if (hashPreset) S = hashPreset.make();
+  if (hashPreset) {
+    S = hashPreset.make();
+    // Clear the #code so a reload brings back this rep's edited sheet, not a fresh copy.
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* not allowed here */ }
+  }
   else if (saved) S = migrate(saved);
   else S = PRESETS.find(p => p.key === 'blank').make();
   if (store.get(K_TIPS, false)) { tips.hidden = true; $('#showTipsWrap').hidden = false; }
+  // A link pasted into a tab that already has the builder open only changes the #code,
+  // so the page does not reload. Open that sheet anyway.
+  window.addEventListener('hashchange', () => {
+    const p = PRESETS.find(x => '#' + x.key === location.hash);
+    if (!p) return;
+    flushEdit(); saveNow();
+    S = p.make(); resetHistory(); render(); closeChooser(); closePanel();
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* not allowed here */ }
+    toast(p.blank ? 'Started a blank sheet.' : 'Started the ' + p.label + ' sheet.');
+  });
   fitZoom();
   render();
   initLibrarySortable();

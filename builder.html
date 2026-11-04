@@ -545,6 +545,20 @@ button { font-family: inherit; }
   .sheetbar .hint-inline { display: none; }
 }
 .lbl-short { display: none; }
+/* Phones: a smaller logo and buttons so the top bar never overlaps itself. */
+@media (max-width: 520px) {
+  .top { gap: 6px; padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); }
+  .brand img { height: 26px; }
+  .tb { height: 34px; }
+  .tb.icon { width: 34px; }
+  .tb.primary { padding: 0 12px; }
+}
+@media (max-width: 420px) { #btnRedo { display: none; } }
+@media (max-width: 360px) {
+  .brand img { height: 22px; }
+  .tb.primary .lbl-short { display: none; }
+  .tb.primary { width: 38px; padding: 0; }
+}
 
 /* ================= print: only the sheet ================= */
 @media print {
@@ -590,7 +604,7 @@ button { font-family: inherit; }
     <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4v12M4 10h12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
     <span class="lbl">New sheet</span>
   </button>
-  <button type="button" class="tb primary" id="btnPrint">
+  <button type="button" class="tb primary" id="btnPrint" aria-label="Print / Save PDF" title="Print / Save PDF">
     <svg width="17" height="17" viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 7.5V3h9v4.5M5.5 14H4a1.5 1.5 0 0 1-1.5-1.5v-4A1.5 1.5 0 0 1 4 7h12a1.5 1.5 0 0 1 1.5 1.5v4A1.5 1.5 0 0 1 16 14h-1.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M5.5 11.5h9V17h-9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
     <span class="lbl">Print / Save PDF</span><span class="lbl-short">Print</span>
   </button>
@@ -1838,7 +1852,8 @@ button { font-family: inherit; }
     if (!menu.hidden && !menu.contains(e.target) && !(menuAnchor && menuAnchor.contains(e.target))) closeMenu(false);
     if (!panel.hidden && !panel.contains(e.target) && !e.target.closest('#btnSheets')) closePanel();
   });
-  window.addEventListener('scroll', () => closeMenu(false), true);
+  // Scrolling the page closes a menu, but scrolling inside the menu itself must not.
+  window.addEventListener('scroll', e => { if (e.target instanceof Node && menu.contains(e.target)) return; closeMenu(false); }, true);
 
   /* ---------------- fit the sheet to the screen ---------------- */
   function fitZoom() {
